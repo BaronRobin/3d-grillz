@@ -1,5 +1,6 @@
 import React from 'react';
 import Hero from './components/Hero';
+import AboutMe from './components/AboutMe';
 import BehindTheDesign from './components/BehindTheDesign';
 import DigitalPipeline from './components/DigitalPipeline';
 import Craftsmanship from './components/Craftsmanship';
@@ -13,11 +14,12 @@ function App() {
   return (
     <div className="app">
       <Hero />
+      <AboutMe />
+      <WebGLShowcase />
       <BehindTheDesign />
       <DigitalPipeline />
       <Craftsmanship />
       <ARVisualization />
-      <WebGLShowcase />
       <Footer />
     </div>
   );
