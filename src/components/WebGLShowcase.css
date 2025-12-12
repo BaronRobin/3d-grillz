@@ -1,0 +1,99 @@
+.webgl-section {
+    background: #151515;
+}
+
+.showcase-card {
+    position: relative;
+    padding: var(--spacing-md);
+    border-radius: 30px;
+    background: radial-gradient(circle at center, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0.4) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    overflow: hidden;
+}
+
+.canvas-wrapper {
+    height: 500px;
+    width: 100%;
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+/* Controls */
+.design-controls {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.control-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+}
+
+.control-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-accent);
+}
+
+.design-info {
+    text-align: center;
+}
+
+.design-info h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.5rem 0;
+    color: var(--color-text);
+    min-width: 180px;
+}
+
+.design-indicator {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+}
+
+.indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.indicator-dot.active {
+    background: var(--color-accent);
+    transform: scale(1.2);
+    box-shadow: 0 0 10px var(--color-accent);
+}
+
+@media (max-width: 768px) {
+    .canvas-wrapper {
+        height: 400px;
+    }
+
+    .design-controls {
+        width: 90%;
+        gap: 1rem;
+        padding: 0.8rem 1rem;
+    }
+}

@@ -1,0 +1,125 @@
+.digital-pipeline {
+    background: #1a1a1a;
+    position: relative;
+    overflow: hidden;
+}
+
+.digital-pipeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 1px;
+    height: 100%;
+    background: linear-gradient(180deg,
+            transparent,
+            var(--color-accent) 20%,
+            var(--color-accent) 80%,
+            transparent);
+    transform: translateX(-50%);
+    opacity: 0.3;
+}
+
+.pipeline-timeline {
+    position: relative;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.pipeline-step {
+    position: relative;
+    padding: var(--spacing-md);
+    display: flex;
+    gap: var(--spacing-md);
+    align-items: flex-start;
+    transition: all var(--transition-base);
+}
+
+.pipeline-step:hover {
+    background: rgba(201, 169, 97, 0.1);
+    border-color: var(--color-accent);
+}
+
+.step-number {
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -2px;
+    line-height: 1;
+    flex-shrink: 0;
+    min-width: 80px;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-sm);
+    color: var(--color-text);
+}
+
+.step-content p {
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.8;
+}
+
+.tech-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: var(--spacing-sm);
+}
+
+.tech-tag {
+    padding: 0.4rem 1rem;
+    background: rgba(201, 169, 97, 0.15);
+    border: 1px solid rgba(201, 169, 97, 0.3);
+    border-radius: 20px;
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all var(--transition-fast);
+}
+
+.tech-tag:hover {
+    background: rgba(201, 169, 97, 0.25);
+    border-color: var(--color-accent);
+    transform: translateY(-2px);
+}
+
+.pipeline-connector {
+    position: absolute;
+    left: 50px;
+    bottom: -var(--spacing-lg);
+    width: 2px;
+    height: var(--spacing-lg);
+    background: linear-gradient(180deg,
+            var(--color-accent),
+            transparent);
+    opacity: 0.5;
+}
+
+@media (max-width: 768px) {
+    .digital-pipeline::before {
+        left: 40px;
+    }
+
+    .pipeline-step {
+        flex-direction: column;
+    }
+
+    .step-number {
+        font-size: 2rem;
+        min-width: auto;
+    }
+
+    .pipeline-connector {
+        left: 20px;
+    }
+}

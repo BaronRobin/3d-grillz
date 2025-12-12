@@ -1,0 +1,129 @@
+.craftsmanship {
+    background: linear-gradient(180deg, #0f0f0f 0%, #1a1a1a 100%);
+}
+
+.specs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-xl);
+}
+
+.spec-card {
+    text-align: center;
+    padding: var(--spacing-md);
+    transition: all var(--transition-base);
+}
+
+.spec-card:hover {
+    border-color: var(--color-accent);
+    transform: translateY(-10px) scale(1.05);
+}
+
+.spec-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+    filter: grayscale(0.3);
+}
+
+.spec-value {
+    font-size: clamp(1.5rem, 3vw, 2.5rem);
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: var(--spacing-xs);
+}
+
+.spec-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+}
+
+/* Materials Section */
+.materials-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.materials-section h3 {
+    text-align: center;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-accent);
+}
+
+.materials-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--spacing-sm);
+}
+
+.material-card {
+    padding: var(--spacing-sm) var(--spacing-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.material-card:hover {
+    background: rgba(201, 169, 97, 0.1);
+    border-color: var(--color-accent);
+    transform: translateX(5px);
+}
+
+.material-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-xs);
+}
+
+.material-header h4 {
+    font-size: var(--font-size-md);
+    color: var(--color-text);
+    margin: 0;
+}
+
+.material-purity {
+    font-size: var(--font-size-xs);
+    color: var(--color-accent);
+    font-weight: 600;
+    padding: 0.25rem 0.75rem;
+    background: rgba(201, 169, 97, 0.15);
+    border-radius: 12px;
+}
+
+.material-finish {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    font-style: italic;
+}
+
+/* Process Description */
+.process-description {
+    padding: var(--spacing-lg);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.process-description h3 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-md);
+    color: var(--color-accent);
+    text-align: center;
+}
+
+.process-description p {
+    line-height: 1.9;
+    margin-bottom: var(--spacing-md);
+}
+
+@media (max-width: 768px) {
+    .specs-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .materials-grid {
+        grid-template-columns: 1fr;
+    }
+}
