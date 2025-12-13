@@ -1,5 +1,5 @@
 .digital-pipeline {
-    background: #1a1a1a;
+    background: transparent;
     position: relative;
     overflow: hidden;
 }
@@ -103,6 +103,20 @@
             var(--color-accent),
             transparent);
     opacity: 0.5;
+    transition: all 1s ease;
+}
+
+.pipeline-step.active {
+    background: rgba(201, 169, 97, 0.1);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 30px rgba(201, 169, 97, 0.1);
+    transform: translateX(10px);
+}
+
+.pipeline-connector.filled {
+    background: var(--color-accent);
+    opacity: 1;
+    box-shadow: 0 0 10px var(--color-accent);
 }
 
 @media (max-width: 768px) {

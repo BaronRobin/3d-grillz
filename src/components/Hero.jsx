@@ -1,17 +1,17 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Hero.css';
 
 const Hero = () => {
-    const scrollToSection = (sectionId) => {
-        const element = document.getElementById(sectionId);
-        if (element) {
-            element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    };
-
     return (
         <section className="hero" id="hero">
             <div className="hero-background">
+                {/* User to replace src with actual webm video path */}
+                {/* <video autoPlay loop muted playsInline className="hero-video">
+                    <source src="/assets/hero-loop.webm" type="video/webm" />
+                </video> */}
+                {/* Placeholder gradient until video is added */}
+                <div className="hero-video-placeholder"></div>
                 <div className="hero-overlay"></div>
             </div>
 
@@ -27,18 +27,12 @@ const Hero = () => {
                 </p>
 
                 <div className="hero-cta fade-in-up stagger-3">
-                    <button
-                        className="btn btn-primary"
-                        onClick={() => scrollToSection('pipeline')}
-                    >
+                    <Link to="/process" className="btn btn-primary">
                         Explore the Pipeline
-                    </button>
-                    <button
-                        className="btn btn-secondary"
-                        onClick={() => scrollToSection('ar-section')}
-                    >
+                    </Link>
+                    <Link to="/craft" className="btn btn-secondary">
                         View AR Experience
-                    </button>
+                    </Link>
                 </div>
 
                 <div className="scroll-indicator fade-in stagger-4">

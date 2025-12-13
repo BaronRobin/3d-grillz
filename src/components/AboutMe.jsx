@@ -8,57 +8,50 @@ const AboutMe = () => {
                 <div className="about-grid">
                     <div className="about-content fade-in-up">
                         <div className="about-header">
-                            <span className="greeting">Yo, I'm Rob</span>
-                            <h2>Let's discover something new. Together.</h2>
+                            <span className="greeting">The Creator</span>
+                            <h2>Rob</h2>
                         </div>
                         <p className="about-text">
-                            I see utility in paying attention to details, from exact spacing to materials
-                            and colors. As a multidisciplinary designer, I blend technical precision
-                            with artistic vision.
+                            A multidisciplinary designer blending technical precision with artistic vision.
+                            Specializing in procedural design and photorealistic rendering to bring
+                            digital jewelry concepts to life.
                         </p>
 
                         <div className="skills-container">
                             <div className="skill-category">
-                                <h4>Design</h4>
+                                <h4>Design Stack</h4>
                                 <ul>
+                                    <li>Blender</li>
+                                    <li>Houdini</li>
                                     <li>Cinema 4D</li>
                                     <li>Octane Render</li>
                                     <li>Adobe CC</li>
-                                    <li>Figma</li>
-                                </ul>
-                            </div>
-                            <div className="skill-category">
-                                <h4>Development</h4>
-                                <ul>
-                                    <li>React / Vite</li>
-                                    <li>HTML / CSS / JS</li>
-                                    <li>Three.js / WebGL</li>
-                                    <li>Tailwind</li>
                                 </ul>
                             </div>
                         </div>
 
                         <div className="about-cta">
-                            <button className="btn btn-primary" onClick={() => window.location.href = 'mailto:contact@baron.com'}>
+                            <button className="btn btn-primary" onClick={() => window.location.href = 'mailto:contact@stuffmadebyrob.com'}>
                                 Get in Touch
                             </button>
                         </div>
                     </div>
 
                     <div className="about-visual glass-dark fade-in-right stagger-2">
-                        <div className="visual-card">
-                            <h3>Why Work With Me?</h3>
-                            <p>
-                                I specialize in creating immersive digital experiences that bridge the gap
-                                between 3D artistry and web performance. Whether it's custom jewelry visualization
-                                or interactive web showcases.
-                            </p>
+                        <div className="about-photo-wrapper">
+                            {/* Placeholder for user photo - User to replace src */}
+                            <div className="photo-placeholder">
+                                <span style={{ fontSize: '3rem' }}>👤</span>
+                                <p>Rob</p>
+                            </div>
+                            {/* <img src="/path-to-rob-photo.jpg" alt="Rob" className="about-photo" /> */}
                         </div>
-                        <div className="visual-card">
-                            <h3>Restoring my Soul</h3>
+
+                        <div className="visual-card" style={{ marginTop: '2rem' }}>
+                            <h3>Vision</h3>
                             <p>
-                                When I'm not designing, I'm exploring the world through a lens—capturing
-                                nature, architecture, and the moments in between.
+                                Restoring the soul of digital objects through imperfection and detail.
+                                Exploring the intersection of fashion, technology, and identity.
                             </p>
                         </div>
                     </div>

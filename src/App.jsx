@@ -1,27 +1,30 @@
 import React from 'react';
-import Hero from './components/Hero';
-import AboutMe from './components/AboutMe';
-import BehindTheDesign from './components/BehindTheDesign';
-import DigitalPipeline from './components/DigitalPipeline';
-import Craftsmanship from './components/Craftsmanship';
-import ARVisualization from './components/ARVisualization';
-import WebGLShowcase from './components/WebGLShowcase';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
+import Navigation from './components/Navigation';
 import Footer from './components/Footer';
+import Home from './pages/Home';
+import Process from './pages/Process';
+import Craft from './pages/Craft';
+import About from './pages/About';
+import ArExperience from './pages/ArExperience';
 import './App.css';
 import './styles/animations.css';
 
 function App() {
   return (
-    <div className="app">
-      <Hero />
-      <AboutMe />
-      <WebGLShowcase />
-      <BehindTheDesign />
-      <DigitalPipeline />
-      <Craftsmanship />
-      <ARVisualization />
-      <Footer />
-    </div>
+    <Router>
+      <div className="app">
+        <Navigation />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/process" element={<Process />} />
+          <Route path="/craft" element={<Craft />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/ar-experience" element={<ArExperience />} />
+        </Routes>
+        <Footer />
+      </div>
+    </Router>
   );
 }
 

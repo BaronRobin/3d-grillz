@@ -55,48 +55,80 @@
 
 .materials-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: var(--spacing-sm);
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--spacing-md);
+    perspective: 1000px;
 }
 
-.material-card {
-    padding: var(--spacing-sm) var(--spacing-md);
-    transition: all var(--transition-fast);
+.material-card-wrapper {
+    height: 180px;
+    background-color: transparent;
     cursor: pointer;
 }
 
-.material-card:hover {
-    background: rgba(201, 169, 97, 0.1);
-    border-color: var(--color-accent);
-    transform: translateX(5px);
+.material-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
 }
 
-.material-header {
+.material-card-wrapper.flipped .material-card-inner {
+    transform: rotateY(180deg);
+}
+
+.material-card-front,
+.material-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 20px;
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    justify-content: center;
+    padding: var(--spacing-sm);
+    /* border: 1px solid var(--color-glass-border); */
+}
+
+.material-card-front {
+    align-items: flex-start;
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.material-card-back {
     align-items: center;
-    margin-bottom: var(--spacing-xs);
+    background: linear-gradient(135deg, var(--color-accent), #d4af77);
+    color: var(--color-primary);
+    transform: rotateY(180deg);
+    box-shadow: 0 0 30px rgba(201, 169, 97, 0.2);
 }
 
-.material-header h4 {
-    font-size: var(--font-size-md);
-    color: var(--color-text);
-    margin: 0;
+/* Hover effect only on non-flipped */
+.material-card-wrapper:not(.flipped):hover .material-card-inner {
+    transform: translateY(-5px);
 }
 
-.material-purity {
-    font-size: var(--font-size-xs);
-    color: var(--color-accent);
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    background: rgba(201, 169, 97, 0.15);
-    border-radius: 12px;
+.material-card-back h4 {
+    color: var(--color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 0.2rem;
 }
 
-.material-finish {
-    font-size: var(--font-size-xs);
+.click-hint {
+    font-size: 0.7rem;
+    text-transform: uppercase;
     color: var(--color-text-secondary);
-    font-style: italic;
+    margin-top: auto;
+    opacity: 0.6;
+    align-self: flex-end;
 }
 
 /* Process Description */

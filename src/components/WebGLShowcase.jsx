@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float, Environment, ContactShadows } from '@react-three/drei';
 import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
@@ -57,8 +58,35 @@ const WebGLShowcase = () => {
                             </Float>
 
                             <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
-                            <OrbitControls enableZoom={false} autoRotate />
+                            <OrbitControls enableZoom={true} autoRotate />
                         </Canvas>
+
+                        <div className="interaction-hint">
+                            <span>Drag to Rotate • Scroll to Zoom</span>
+                        </div>
+
+                        {/* Top Right Controls */}
+                        <div className="view-controls">
+                            <button
+                                className="view-btn"
+                                onClick={() => {
+                                    const elem = document.querySelector('.canvas-wrapper');
+                                    if (!document.fullscreenElement) {
+                                        elem.requestFullscreen().catch(err => {
+                                            console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                                        });
+                                    } else {
+                                        document.exitFullscreen();
+                                    }
+                                }}
+                                title="Toggle Fullscreen"
+                            >
+                                ⛶
+                            </button>
+                            <Link to="/ar-experience" className="view-btn ar-btn" title="View in AR">
+                                AR
+                            </Link>
+                        </div>
 
                         <div className="design-controls">
                             <button className="control-btn" onClick={prevDesign}>

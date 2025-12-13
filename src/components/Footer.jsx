@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const Footer = () => {
@@ -81,10 +82,10 @@ const Footer = () => {
 
                 <div className="footer-bottom">
                     <p className="copyright">
-                        © {currentYear} 3D Grillz Digital Pipeline. Created by <a href="https://instagram.com/stuffmadebyrob" target="_blank" rel="noopener noreferrer">@stuffmadebyrob</a>
+                        © {currentYear} 3D Grillz Digital Pipeline. Created by <Link to="/about">@stuffmadebyrob</Link>
                     </p>
                     <p className="thesis-note">
-                        Bachelor's Thesis — Virtual Design — Hochschule Kaiserslautern
+                        Bachelor's Thesis • Virtual Design • Hochschule Kaiserslautern
                     </p>
                 </div>
             </div>

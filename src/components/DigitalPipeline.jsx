@@ -1,13 +1,39 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import './DigitalPipeline.css';
 import { FaTooth, FaCube, FaLayerGroup, FaGem, FaMobileAlt } from 'react-icons/fa';
 
 const DigitalPipeline = () => {
+    const [activeSteps, setActiveSteps] = useState([]);
+    const stepsRef = useRef([]);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach((entry) => {
+                    if (entry.isIntersecting) {
+                        const index = parseInt(entry.target.getAttribute('data-index'));
+                        setActiveSteps((prev) => {
+                            if (!prev.includes(index)) return [...prev, index];
+                            return prev;
+                        });
+                    }
+                });
+            },
+            { threshold: 0.4 }
+        );
+
+        stepsRef.current.forEach((step) => {
+            if (step) observer.observe(step);
+        });
+
+        return () => observer.disconnect();
+    }, []);
+
     const pipelineSteps = [
         {
             number: '01',
             title: '3D Scanning',
-            description: 'High-resolution intraoral scanning captures precise dental geometry with sub-millimeter accuracy using iTero or Medit i700 systems.',
+            description: 'High-Fidelity Intraoral Scanners capture dental geometry with sub-millimeter precision, creating a perfect digital impression.',
             tech: ['Structured Light', 'Laser Triangulation', 'STL Export'],
             icon: <FaTooth />
         },
@@ -55,7 +81,9 @@ const DigitalPipeline = () => {
                     {pipelineSteps.map((step, index) => (
                         <div
                             key={step.number}
-                            className={`pipeline-step glass-dark hover-lift fade-in-up stagger-${index + 1}`}
+                            ref={(el) => (stepsRef.current[index] = el)}
+                            data-index={index}
+                            className={`pipeline-step glass-dark hover-lift fade-in-up stagger-${index + 1} ${activeSteps.includes(index) ? 'active' : ''}`}
                         >
                             <div className="step-number gradient-text">{step.number}</div>
                             <div className="step-content">
@@ -71,7 +99,7 @@ const DigitalPipeline = () => {
                                 </div>
                             </div>
                             {index < pipelineSteps.length - 1 && (
-                                <div className="pipeline-connector"></div>
+                                <div className={`pipeline-connector ${activeSteps.includes(index) && activeSteps.includes(index + 1) ? 'filled' : ''}`}></div>
                             )}
                         </div>
                     ))}
