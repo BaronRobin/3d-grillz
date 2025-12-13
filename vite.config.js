@@ -8,17 +8,7 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks(id) {
-          if (id.includes('node_modules')) {
-            if (id.includes('three') || id.includes('react-three')) {
-              return 'three-vendor';
-            }
-            if (id.includes('react')) {
-              return 'react-vendor';
-            }
-            return 'vendor'; // Split other dependencies into a common vendor chunk
-          }
-        },
+        // manualChunks removed to avoid circular dependency/undefined issues in production
       },
     },
     chunkSizeWarningLimit: 1000, // Increase limit slightly as 3D apps are naturally larger
