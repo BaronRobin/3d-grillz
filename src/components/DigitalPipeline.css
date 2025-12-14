@@ -4,21 +4,7 @@
     overflow: hidden;
 }
 
-.digital-pipeline::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 50%;
-    width: 1px;
-    height: 100%;
-    background: linear-gradient(180deg,
-            transparent,
-            var(--color-accent) 20%,
-            var(--color-accent) 80%,
-            transparent);
-    transform: translateX(-50%);
-    opacity: 0.3;
-}
+/* Big vertical line removed */
 
 .pipeline-timeline {
     position: relative;
@@ -36,11 +22,15 @@
     gap: var(--spacing-md);
     align-items: flex-start;
     transition: all var(--transition-base);
+    /* Ensure no borders if "stripes" meant borders */
+    border: none !important;
 }
 
+/* Subtle hover only */
 .pipeline-step:hover {
-    background: rgba(201, 169, 97, 0.1);
-    border-color: var(--color-accent);
+    transform: translateY(-5px);
+    background: rgba(255, 255, 255, 0.05);
+    /* Slightly lighter */
 }
 
 .step-number {
@@ -48,8 +38,11 @@
     font-weight: 800;
     letter-spacing: -2px;
     line-height: 1;
+    /* Helps alignment */
     flex-shrink: 0;
     min-width: 80px;
+    margin-top: -5px;
+    /* Visual tweak to align top of number with top of H3 text */
 }
 
 .step-content {
@@ -60,6 +53,9 @@
     font-size: var(--font-size-lg);
     margin-bottom: var(--spacing-sm);
     color: var(--color-text);
+    line-height: 1;
+    /* Align with number */
+    margin-top: 0;
 }
 
 .step-content p {
@@ -76,8 +72,8 @@
 
 .tech-tag {
     padding: 0.4rem 1rem;
-    background: rgba(201, 169, 97, 0.15);
-    border: 1px solid rgba(201, 169, 97, 0.3);
+    background: rgba(201, 169, 97, 0.1);
+    /* Border removed to avoid "stripes" feel */
     border-radius: 20px;
     font-size: 0.75rem;
     color: var(--color-accent);
@@ -88,42 +84,11 @@
 }
 
 .tech-tag:hover {
-    background: rgba(201, 169, 97, 0.25);
-    border-color: var(--color-accent);
+    background: rgba(201, 169, 97, 0.2);
     transform: translateY(-2px);
 }
 
-.pipeline-connector {
-    position: absolute;
-    left: 50px;
-    bottom: -var(--spacing-lg);
-    width: 2px;
-    height: var(--spacing-lg);
-    background: linear-gradient(180deg,
-            var(--color-accent),
-            transparent);
-    opacity: 0.5;
-    transition: all 1s ease;
-}
-
-.pipeline-step.active {
-    background: rgba(201, 169, 97, 0.1);
-    border-color: var(--color-accent);
-    box-shadow: 0 0 30px rgba(201, 169, 97, 0.1);
-    transform: translateX(10px);
-}
-
-.pipeline-connector.filled {
-    background: var(--color-accent);
-    opacity: 1;
-    box-shadow: 0 0 10px var(--color-accent);
-}
-
 @media (max-width: 768px) {
-    .digital-pipeline::before {
-        left: 40px;
-    }
-
     .pipeline-step {
         flex-direction: column;
     }
@@ -131,9 +96,6 @@
     .step-number {
         font-size: 2rem;
         min-width: auto;
-    }
-
-    .pipeline-connector {
-        left: 20px;
+        margin-top: 0;
     }
 }

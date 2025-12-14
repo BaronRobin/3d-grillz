@@ -1,100 +1,193 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { FaSquare } from 'react-icons/fa';
 import './Craftsmanship.css';
+
+// Simple CountUp Component
+const CountUp = ({ start = 0, end, duration = 2000, suffix = '', prefix = '', decimals = 0 }) => {
+    const [count, setCount] = useState(start);
+    const elementRef = useRef(null);
+    const hasAnimated = useRef(false);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && !hasAnimated.current) {
+                    hasAnimated.current = true;
+                    let startTime = null;
+                    const step = (timestamp) => {
+                        if (!startTime) startTime = timestamp;
+                        const progress = Math.min((timestamp - startTime) / duration, 1);
+
+                        // Easing function (easeOutExpo)
+                        const ease = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+
+                        const current = start + (end - start) * ease;
+                        setCount(current);
+
+                        if (progress < 1) {
+                            window.requestAnimationFrame(step);
+                        }
+                    };
+                    window.requestAnimationFrame(step);
+                }
+            },
+            { threshold: 0.5 }
+        );
+
+        if (elementRef.current) observer.observe(elementRef.current);
+
+        return () => observer.disconnect();
+    }, [end, duration, start]);
+
+    return (
+        <span ref={elementRef}>
+            {prefix}{count.toFixed(decimals)}{suffix}
+        </span>
+    );
+};
 
 const Craftsmanship = () => {
     const [showDetails, setShowDetails] = useState(false);
-    const [flippedMaterial, setFlippedMaterial] = useState(null);
+    const [showAllMaterials, setShowAllMaterials] = useState(false);
 
     const specs = [
-        { label: 'Production Time', value: '3 months', icon: '⏱️' },
-        { label: 'Setting Hours', value: '480 hrs', icon: '⚙️' },
-        { label: 'Expert Team', value: '4 Experts', icon: '👥' },
-        { label: 'Avg Polygons', value: '250,000+', icon: '💎' }
+        { label: 'Production Time', end: 3, suffix: ' months', icon: '⏱️' },
+        { label: 'Working Hours', end: 480, suffix: ' hrs', icon: '⚙️' },
+        { label: 'Precision', start: 10, end: 0.01, suffix: ' mm', icon: '🎯', decimals: 2 }
     ];
 
-    const materials = [
+    const allMaterials = [
         {
             name: 'Gold',
             purity: '18K',
             finish: 'Mirror Polish',
-            desc: 'Classic luxury with timeless durability.'
+            desc: 'Classic luxury with timeless durability.',
+            className: 'mat-gold'
         },
         {
-            name: 'Platinum',
-            purity: '950 PT',
-            finish: 'Satin',
-            desc: 'Hypoallergenic density and weight.'
+            name: 'Sterling Silver',
+            purity: '925',
+            finish: 'High Polish',
+            desc: 'Brilliant luster with a modern edge.',
+            className: 'mat-silver'
         },
         {
             name: 'Titanium',
             purity: 'Grade 5',
             finish: 'Brushed',
-            desc: 'Aerospace-grade strength to weight ratio.'
+            desc: 'Aerospace-grade strength to weight ratio.',
+            className: 'mat-titanium'
         },
         {
-            name: 'Cobalt',
-            purity: 'Chrome',
-            finish: 'High Glo',
-            desc: 'Biocompatible alternative for precision fit.'
+            name: 'Rose Gold',
+            purity: '18K',
+            finish: 'Satin',
+            desc: 'Warm hues for a distinct aesthetic.',
+            className: 'mat-rose'
+        },
+        {
+            name: 'White Gold',
+            purity: '18K',
+            finish: 'Rhodium',
+            desc: 'Bright, reflective, and hypoallergenic.',
+            className: 'mat-white-gold'
+        },
+        {
+            name: 'Black Gold',
+            purity: '18K',
+            finish: 'Matte',
+            desc: 'Edgy, sophisticated dark finish.',
+            className: 'mat-black-gold'
+        },
+        {
+            name: 'Ceramic',
+            purity: 'Zirconia',
+            finish: 'Glazed',
+            desc: 'Details so fine they look liquid.',
+            className: 'mat-ceramic'
+        },
+        {
+            name: 'Platinum',
+            purity: '950',
+            finish: 'Polished',
+            desc: 'The ultimate symbol of prestige.',
+            className: 'mat-platinum'
+        },
+        {
+            name: 'VVS Diamond',
+            purity: 'Flawless',
+            finish: 'Pavé',
+            desc: 'Hand-set stones for maximum brilliance.',
+            className: 'mat-diamond'
         }
     ];
-
-    const handleMaterialClick = (index) => {
-        setFlippedMaterial(flippedMaterial === index ? null : index);
-    };
 
     return (
         <section className="craftsmanship section" id="craftsmanship">
             <div className="container">
-                <div className="section-header fade-in-up">
+                <div className="section-header fade-in-down">
                     <h2>Cutting-Edge Craftsmanship</h2>
                     <p className="section-subtitle">
                         Where precision meets artistry in every detail
                     </p>
                 </div>
 
-                <div className="specs-grid">
+                <div className="specs-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', justifyContent: 'center' }}>
                     {specs.map((spec, index) => (
                         <div
                             key={index}
-                            className={`spec-card glass-dark hover-lift fade-in-up stagger-${index + 1}`}
+                            className={`spec-card glass-dark fade-in-down stagger-${index + 1}`}
+                            style={{ border: 'none' }}
                         >
                             <div className="spec-icon">{spec.icon}</div>
-                            <div className="spec-value gradient-text">{spec.value}</div>
+                            <div className="spec-value gradient-text">
+                                <CountUp
+                                    start={spec.start || 0}
+                                    end={spec.end}
+                                    suffix={spec.suffix}
+                                    decimals={spec.decimals || 0}
+                                    duration={2000 + (index * 200)}
+                                />
+                            </div>
                             <div className="spec-label">{spec.label}</div>
                         </div>
                     ))}
                 </div>
 
-                <div className="materials-section fade-in-up stagger-3">
+                <div className="materials-section fade-in-down stagger-3">
                     <h3>Premium Materials</h3>
-                    <div className="materials-grid">
-                        {materials.map((material, index) => (
-                            <div
-                                key={index}
-                                className={`material-card-wrapper ${flippedMaterial === index ? 'flipped' : ''}`}
-                                onClick={() => handleMaterialClick(index)}
-                            >
-                                <div className="material-card-inner">
-                                    <div className="material-card-front glass">
+
+                    <div className={`materials-grid-wrapper ${showAllMaterials ? 'expanded' : ''}`}>
+                        <div className="materials-grid">
+                            {allMaterials.map((material, index) => (
+                                <div
+                                    key={index}
+                                    className="material-card-wrapper-static"
+                                >
+                                    <div className={`material-card-static glass ${material.className}`}>
                                         <div className="material-header">
                                             <h4>{material.name}</h4>
                                             <span className="material-purity">{material.purity}</span>
                                         </div>
                                         <div className="material-finish">{material.finish}</div>
-                                        <div className="click-hint">Click to flip ↻</div>
-                                    </div>
-                                    <div className="material-card-back glass-dark">
-                                        <h4>{material.name}</h4>
-                                        <p>{material.desc}</p>
+                                        <p className="material-desc-static">{material.desc}</p>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                    </div>
+
+                    <div style={{ textAlign: 'center', marginTop: '2rem', position: 'relative', zIndex: 10 }}>
+                        <button
+                            className="btn btn-secondary"
+                            onClick={() => setShowAllMaterials(!showAllMaterials)}
+                        >
+                            {showAllMaterials ? 'Show Less' : 'Explore All Materials'}
+                        </button>
                     </div>
                 </div>
 
-                <div className="process-description glass-dark fade-in-up stagger-4">
+                <div className="process-description glass-dark fade-in-down stagger-4" style={{ border: 'none' }}>
                     <h3>The Process</h3>
                     <p>
                         Each piece is handcrafted by expert artisans over months of meticulous work.

@@ -44,91 +44,167 @@
 /* Materials Section */
 .materials-section {
     margin-bottom: var(--spacing-xl);
+    position: relative;
 }
 
 .materials-section h3 {
     text-align: center;
-    font-size: clamp(1.5rem, 3vw, 2rem);
-    margin-bottom: var(--spacing-md);
-    color: var(--color-accent);
+    font-size: clamp(2rem, 4vw, 2.5rem);
+    margin-bottom: var(--spacing-lg);
+    font-family: inherit;
+    /* Revert to system font */
+    color: #fff;
+    /* Luxury white, gold accent comes from elements */
+}
+
+/* Wrapper for smooth expansion */
+.materials-grid-wrapper {
+    max-height: 320px;
+    /* Show first row perfectly */
+    overflow: hidden;
+    transition: max-height 1s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.materials-grid-wrapper.expanded {
+    max-height: 2500px;
+    /* Enough to show all */
+}
+
+/* Gradient Fade for Closed State */
+.materials-grid-wrapper::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    background: linear-gradient(to bottom, transparent 0%, #0a0a0a 100%);
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+    opacity: 1;
+}
+
+.materials-grid-wrapper.expanded::after {
+    opacity: 0;
 }
 
 .materials-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: var(--spacing-md);
-    perspective: 1000px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    padding: 1rem;
 }
 
-.material-card-wrapper {
-    height: 180px;
-    background-color: transparent;
-    cursor: pointer;
-}
-
-.material-card-inner {
-    position: relative;
-    width: 100%;
+/* Slate Look Material Cards */
+.material-card-static {
     height: 100%;
-    text-align: center;
-    transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-    transform-style: preserve-3d;
-}
-
-.material-card-wrapper.flipped .material-card-inner {
-    transform: rotateY(180deg);
-}
-
-.material-card-front,
-.material-card-back {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    border-radius: 20px;
+    min-height: 220px;
+    border-radius: 4px;
+    padding: 2rem;
+    background: #1a1a1a;
+    /* Dark Slate */
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    padding: var(--spacing-sm);
-    /* border: 1px solid var(--color-glass-border); */
+    position: relative;
+    transition: all 0.3s ease;
 }
 
-.material-card-front {
-    align-items: flex-start;
-    padding: var(--spacing-md);
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.material-card-back {
-    align-items: center;
-    background: linear-gradient(135deg, var(--color-accent), #d4af77);
-    color: var(--color-primary);
-    transform: rotateY(180deg);
-    box-shadow: 0 0 30px rgba(201, 169, 97, 0.2);
-}
-
-/* Hover effect only on non-flipped */
-.material-card-wrapper:not(.flipped):hover .material-card-inner {
+.material-card-static:hover {
     transform: translateY(-5px);
+    background: #222;
+    border-color: rgba(255, 255, 255, 0.25);
 }
 
-.material-card-back h4 {
-    color: var(--color-primary);
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    border-bottom: 2px solid rgba(0, 0, 0, 0.1);
-    padding-bottom: 0.2rem;
+.material-header {
+    margin-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
 }
 
-.click-hint {
-    font-size: 0.7rem;
+.material-header h4 {
+    font-family: inherit;
+    /* Revert font */
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+    margin: 0;
+}
+
+.material-purity {
+    font-size: 0.75rem;
     text-transform: uppercase;
+    letter-spacing: 1px;
     color: var(--color-text-secondary);
-    margin-top: auto;
-    opacity: 0.6;
-    align-self: flex-end;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: none;
+}
+
+.material-finish {
+    font-size: 0.85rem;
+    color: #aaa;
+    margin-bottom: 1rem;
+    font-style: italic;
+}
+
+.material-desc-static {
+    font-size: 0.95rem;
+    color: #ccc;
+    /* High readability */
+    line-height: 1.6;
+}
+
+/* Material Accents (Borders) */
+.mat-gold {
+    border-left: 3px solid #FFD700;
+}
+
+.mat-silver {
+    border-left: 3px solid #C0C0C0;
+}
+
+.mat-rose {
+    border-left: 3px solid #B76E79;
+}
+
+.mat-white-gold {
+    border-left: 3px solid #F5F5F0;
+}
+
+.mat-platinum {
+    border-left: 3px solid #E5E4E2;
+}
+
+.mat-titanium {
+    border-left: 3px solid #878685;
+}
+
+.mat-black-gold {
+    border-left: 3px solid #333;
+}
+
+.mat-ceramic {
+    border-left: 3px solid #FFF;
+}
+
+.mat-diamond {
+    border-left: 3px solid #B9F2FF;
+}
+
+/* Subtle Hover Glows per material (Optional, kept minimal) */
+.mat-gold:hover {
+    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.05);
+}
+
+.mat-diamond:hover {
+    box-shadow: 0 5px 20px rgba(185, 242, 255, 0.1);
 }
 
 /* Process Description */
@@ -136,6 +212,8 @@
     padding: var(--spacing-lg);
     max-width: 800px;
     margin: 0 auto;
+    border: none !important;
+    /* Force no border */
 }
 
 .process-description h3 {
@@ -150,12 +228,27 @@
     margin-bottom: var(--spacing-md);
 }
 
+/* Mobile Adjustments */
 @media (max-width: 768px) {
     .specs-grid {
         grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
+    }
+
+    .spec-card {
+        padding: var(--spacing-sm);
     }
 
     .materials-grid {
         grid-template-columns: 1fr;
+    }
+
+    .materials-grid-wrapper {
+        max-height: 340px;
+        /* 1 card on mobile */
+    }
+
+    .material-header h4 {
+        font-size: 1.2rem;
     }
 }

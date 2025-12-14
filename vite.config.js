@@ -8,9 +8,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        // manualChunks removed to avoid circular dependency/undefined issues in production
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-3d': ['three', '@react-three/fiber', '@react-three/drei'],
+        },
       },
     },
-    chunkSizeWarningLimit: 1000, // Increase limit slightly as 3D apps are naturally larger
+    chunkSizeWarningLimit: 1000,
   },
 })

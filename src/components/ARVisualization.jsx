@@ -51,6 +51,28 @@ const ARVisualization = () => {
                                 </p>
                             </div>
                         </div>
+                    </div> {/* End ar-feature-grid */}
+
+                    <div className="tech-comparison fade-in-up stagger-4">
+                        <h3>Technology Stack</h3>
+                        <div className="tech-stack-grid">
+                            <div className="tech-item">
+                                <div className="tech-name">Unreal Engine 5</div>
+                                <div className="tech-desc">Real-time rendering & materials</div>
+                            </div>
+                            <div className="tech-item">
+                                <div className="tech-name">Apple ARKit</div>
+                                <div className="tech-desc">Face tracking & spatial awareness</div>
+                            </div>
+                            <div className="tech-item">
+                                <div className="tech-name">WebXR / Three.js</div>
+                                <div className="tech-desc">Browser-based AR alternative</div>
+                            </div>
+                            <div className="tech-item">
+                                <div className="tech-name">glTF 2.0</div>
+                                <div className="tech-desc">3D model format standard</div>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="ar-cta fade-in-up stagger-5">

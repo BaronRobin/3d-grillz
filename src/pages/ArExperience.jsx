@@ -9,6 +9,9 @@ const ArExperience = () => {
     const [cameraPermission, setCameraPermission] = useState('prompt'); // prompt, granted, denied
 
     useEffect(() => {
+        // Scroll to top on mount
+        window.scrollTo(0, 0);
+
         // Simple mobile detection
         const userAgent = navigator.userAgent || navigator.vendor || window.opera;
         if (/android/i.test(userAgent) || /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {

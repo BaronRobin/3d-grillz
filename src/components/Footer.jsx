@@ -1,91 +1,55 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { FaInstagram, FaLinkedin, FaGithub } from 'react-icons/fa';
 import './Footer.css';
 
 const Footer = () => {
-    const currentYear = new Date().getFullYear();
+    const navigate = useNavigate();
+    const location = useLocation();
 
-    const sections = {
-        explore: [
-            { label: 'Behind the Design', href: '#behind-design' },
-            { label: 'Digital Pipeline', href: '#pipeline' },
-            { label: 'Craftsmanship', href: '#craftsmanship' },
-            { label: 'AR Experience', href: '#ar-section' }
-        ],
-        connect: [
-            { label: 'Instagram', href: 'https://instagram.com/stuffmadebyrob', external: true },
-            { label: 'Email', href: 'mailto:contact@grillzdesign.com', external: true },
-            { label: 'LinkedIn', href: '#', external: true }
-        ]
-    };
-
-    const scrollToSection = (href) => {
-        if (href.startsWith('#')) {
-            const element = document.querySelector(href);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth' });
-            }
+    const handleScroll = (id) => {
+        if (location.pathname !== '/') {
+            navigate('/');
+            setTimeout(() => {
+                const el = document.getElementById(id);
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }, 300);
+        } else {
+            const el = document.getElementById(id);
+            if (el) el.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
     return (
         <footer className="footer">
             <div className="container">
-                <div className="footer-content">
-                    <div className="footer-section">
-                        <h3 className="footer-title gradient-text">3D Grillz</h3>
-                        <p className="footer-description">
-                            Bridging traditional craftsmanship with digital innovation.
-                            A Bachelor's Thesis exploring the future of wearable design.
-                        </p>
-                    </div>
-
-                    <div className="footer-section">
+                <div className="footer-content" style={{ justifyContent: 'center', gap: '4rem' }}>
+                    <div className="footer-links">
                         <h4>Explore</h4>
-                        <ul className="footer-links">
-                            {sections.explore.map((link, index) => (
-                                <li key={index}>
-                                    <a
-                                        href={link.href}
-                                        onClick={(e) => {
-                                            e.preventDefault();
-                                            scrollToSection(link.href);
-                                        }}
-                                        className="footer-link"
-                                    >
-                                        {link.label}
-                                    </a>
-                                </li>
-                            ))}
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                            <li><button onClick={() => [handleScroll('process')]} className="footer-nav-btn">The Process</button></li>
+                            <li><button onClick={() => [handleScroll('craft')]} className="footer-nav-btn">Craftsmanship</button></li>
+                            <li><Link to="/about" className="footer-nav-btn">About The Creator</Link></li>
+                            <li><Link to="/ar-experience" className="footer-nav-btn">AR Experience</Link></li>
                         </ul>
                     </div>
 
-                    <div className="footer-section">
+                    <div className="footer-social">
                         <h4>Connect</h4>
-                        <ul className="footer-links">
-                            {sections.connect.map((link, index) => (
-                                <li key={index}>
-                                    <a
-                                        href={link.href}
-                                        target={link.external ? '_blank' : '_self'}
-                                        rel={link.external ? 'noopener noreferrer' : ''}
-                                        className="footer-link"
-                                    >
-                                        {link.label}
-                                        {link.external && ' ↗'}
-                                    </a>
-                                </li>
-                            ))}
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                            <li><a href="https://instagram.com/stuffmadebyrob" target="_blank" rel="noopener noreferrer" className="footer-nav-btn"><FaInstagram style={{ marginRight: '8px' }} /> Instagram</a></li>
+                            <li><a href="https://www.linkedin.com/in/baron-robin/" target="_blank" rel="noopener noreferrer" className="footer-nav-btn"><FaLinkedin style={{ marginRight: '8px' }} /> LinkedIn</a></li>
+                            <li><a href="#" target="_blank" rel="noopener noreferrer" className="footer-nav-btn"><FaGithub style={{ marginRight: '8px' }} /> GitHub</a></li>
                         </ul>
                     </div>
                 </div>
 
                 <div className="footer-bottom">
-                    <p className="copyright">
-                        © {currentYear} 3D Grillz Digital Pipeline. Created by <Link to="/about">@stuffmadebyrob</Link>
-                    </p>
-                    <p className="thesis-note">
+                    <p className="thesis-note" style={{ color: '#e0e0e0', fontSize: '0.85rem', letterSpacing: '1px', opacity: 0.8 }}>
                         Bachelor's Thesis • Virtual Design • Hochschule Kaiserslautern
+                    </p>
+                    <p style={{ color: '#666', fontSize: '0.75rem', marginTop: '0.5rem' }}>
+                        &copy; {new Date().getFullYear()} Robin Baron. All Rights Reserved.
                     </p>
                 </div>
             </div>

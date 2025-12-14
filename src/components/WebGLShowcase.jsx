@@ -42,11 +42,10 @@ const WebGLShowcase = () => {
         <section className="webgl-section section" id="showcase">
             <div className="container">
                 <div className="section-header fade-in-up">
-                    <h2>Interactive Showcase</h2>
-                    <p className="section-subtitle">Explore our signature styles in 3D</p>
+                    <h2 style={{ marginBottom: 0 }}>Interactive Showcase</h2>
                 </div>
 
-                <div className="showcase-card glass-dark fade-in-up">
+                <div className="showcase-card fade-in-up" style={{ background: 'transparent', boxShadow: 'none' }}>
                     <div className="canvas-wrapper">
                         <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
                             <ambientLight intensity={0.5} />
@@ -58,7 +57,7 @@ const WebGLShowcase = () => {
                             </Float>
 
                             <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
-                            <OrbitControls enableZoom={true} autoRotate />
+                            <OrbitControls enableZoom={true} enablePan={false} autoRotate />
                         </Canvas>
 
                         <div className="interaction-hint">
@@ -83,9 +82,7 @@ const WebGLShowcase = () => {
                             >
                                 ⛶
                             </button>
-                            <Link to="/ar-experience" className="view-btn ar-btn" title="View in AR">
-                                AR
-                            </Link>
+                            {/* AR Button removed as requested */}
                         </div>
 
                         <div className="design-controls">

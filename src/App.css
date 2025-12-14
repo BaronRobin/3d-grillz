@@ -4,19 +4,20 @@
   /* Color Palette */
   --color-primary: #1a1a1a;
   --color-secondary: #2d2d2d;
-  --color-accent: #c9a961; /* Gold accent */
+  --color-accent: #c9a961;
+  /* Gold accent */
   --color-text: #ffffff;
   --color-text-secondary: #b0b0b0;
   --color-glass-bg: rgba(255, 255, 255, 0.05);
   --color-glass-border: rgba(255, 255, 255, 0.1);
-  
+
   /* Spacing */
   --spacing-xs: 0.5rem;
   --spacing-sm: 1rem;
   --spacing-md: 2rem;
   --spacing-lg: 4rem;
   --spacing-xl: 6rem;
-  
+
   /* Typography */
   --font-primary: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', 'Roboto', sans-serif;
   --font-size-xs: 0.875rem;
@@ -25,7 +26,7 @@
   --font-size-lg: 2rem;
   --font-size-xl: 3rem;
   --font-size-xxl: 4.5rem;
-  
+
   /* Transitions */
   --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   --transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -81,8 +82,19 @@ body {
   cursor: pointer;
   transition: all var(--transition-base);
   overflow: hidden;
+  /* Ensures shiny effect is masked */
   text-transform: uppercase;
   font-family: var(--font-primary);
+  z-index: 1;
+  /* Ensure stacking context */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  /* Safari border-radius fix */
+  mask-image: radial-gradient(white, black);
+}
+
+/* Remove default link underline for buttons */
+a.btn::after {
+  display: none;
 }
 
 .btn-primary {
@@ -91,19 +103,39 @@ body {
   box-shadow: 0 10px 30px rgba(201, 169, 97, 0.3);
 }
 
+/* Shine effect restored and refined */
+.btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
 .btn-primary::before {
   content: '';
   position: absolute;
   top: 0;
   left: -100%;
-  width: 100%;
+  width: 50%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left var(--transition-slow);
+  background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transform: skewX(-20deg);
+  transition: left 0.5s ease;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .btn-primary:hover::before {
-  left: 100%;
+  left: 150%;
+  animation: shine 1.5s infinite;
+}
+
+@keyframes shine {
+  0% {
+    left: -100%;
+  }
+
+  100% {
+    left: 200%;
+  }
 }
 
 .btn-primary:hover {
@@ -143,7 +175,12 @@ body {
 }
 
 /* Typography */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-weight: 700;
   line-height: 1.2;
   margin-bottom: var(--spacing-sm);
@@ -218,7 +255,7 @@ a:hover::after {
     --font-size-xl: 2rem;
     --font-size-lg: 1.5rem;
   }
-  
+
   .section {
     padding: var(--spacing-lg) 0;
   }
