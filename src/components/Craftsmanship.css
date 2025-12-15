@@ -59,152 +59,235 @@
 
 /* Wrapper for smooth expansion */
 .materials-grid-wrapper {
-    max-height: 320px;
-    /* Show first row perfectly */
+    max-height: 315px;
+    /* Tightened to perfectly hide second row */
     overflow: hidden;
-    transition: max-height 1s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: max-height 0.8s ease-in-out;
     position: relative;
     margin-bottom: 1rem;
 }
 
 .materials-grid-wrapper.expanded {
-    max-height: 2500px;
-    /* Enough to show all */
-}
-
-/* Gradient Fade for Closed State */
-.materials-grid-wrapper::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 150px;
-    background: linear-gradient(to bottom, transparent 0%, #0a0a0a 100%);
-    pointer-events: none;
-    transition: opacity 0.5s ease;
-    opacity: 1;
-}
-
-.materials-grid-wrapper.expanded::after {
-    opacity: 0;
+    max-height: 3200px !important;
+    /* Override all breakpoints */
 }
 
 .materials-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
     padding: 1rem;
 }
 
-/* Slate Look Material Cards */
+/* Material Slates (Bin/Ingot Style) */
 .material-card-static {
-    height: 100%;
-    min-height: 220px;
-    border-radius: 4px;
+    height: 280px;
+    /* Fixed height for consistent layout */
+    border-radius: 20px;
     padding: 2rem;
-    background: #1a1a1a;
-    /* Dark Slate */
-    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
     position: relative;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    /* Removed borders to let gradients shine */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    color: #fff;
+    overflow: hidden;
 }
 
-.material-card-static:hover {
-    transform: translateY(-5px);
-    background: #222;
-    border-color: rgba(255, 255, 255, 0.25);
-}
-
+/* Content styling for legibility on colored backgrounds */
 .material-header {
-    margin-bottom: 1rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
     padding-bottom: 0.5rem;
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
 }
 
 .material-header h4 {
     font-family: inherit;
-    /* Revert font */
-    font-size: 1.25rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: #fff;
     margin: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .material-purity {
     font-size: 0.75rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    color: var(--color-text-secondary);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 2px 8px;
-    border-radius: 4px;
-    border: none;
+    color: rgba(255, 255, 255, 0.9);
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 600;
 }
 
 .material-finish {
-    font-size: 0.85rem;
-    color: #aaa;
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.9);
     margin-bottom: 1rem;
     font-style: italic;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .material-desc-static {
     font-size: 0.95rem;
-    color: #ccc;
-    /* High readability */
-    line-height: 1.6;
+    color: #fff;
+    line-height: 1.5;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
-/* Material Accents (Borders) */
+.material-card-static:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Metallic Sheen Overlay (Shared) */
+.material-card-static::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(120deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 70%);
+    pointer-events: none;
+    mix-blend-mode: overlay;
+    /* Makes the white shine blend with the metal color */
+}
+
+/* --- Specific Material Slate Gradients --- */
+
+/* Gold: Vibrant Yellow-Gold */
 .mat-gold {
-    border-left: 3px solid #FFD700;
+    background: linear-gradient(135deg, #DAA520 0%, #FFD700 50%, #B8860B 100%) !important;
+    color: #fff;
+    border: 1px solid rgba(255, 215, 0, 0.3);
 }
 
+/* Sterling Silver: Bright White/Grey */
 .mat-silver {
-    border-left: 3px solid #C0C0C0;
+    background: linear-gradient(135deg, #A9A9A9 0%, #FFFFFF 50%, #A9A9A9 100%) !important;
+    color: #333 !important;
 }
 
-.mat-rose {
-    border-left: 3px solid #B76E79;
+.mat-silver .material-header h4,
+.mat-silver .material-desc-static,
+.mat-silver .material-finish {
+    color: #222 !important;
+    text-shadow: none !important;
 }
 
-.mat-white-gold {
-    border-left: 3px solid #F5F5F0;
+.mat-silver .material-purity {
+    color: #333 !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    background: rgba(0, 0, 0, 0.05) !important;
 }
 
-.mat-platinum {
-    border-left: 3px solid #E5E4E2;
-}
-
+/* Titanium: Blue-Grey Steel */
 .mat-titanium {
-    border-left: 3px solid #878685;
+    background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%) !important;
+    /* Or a more metallic one */
+    background: linear-gradient(135deg, #506780 0%, #7b9bb3 50%, #506780 100%) !important;
+    color: #fff;
 }
 
+/* Rose Gold: Copper/Pink */
+.mat-rose {
+    background: linear-gradient(135deg, #c27972 0%, #eebdbe 50%, #c27972 100%) !important;
+    color: #fff;
+}
+
+/* White Gold: Warm metallic white */
+.mat-white-gold {
+    background: linear-gradient(135deg, #bfbfbf 0%, #fcfcfc 50%, #bfbfbf 100%) !important;
+    color: #333 !important;
+}
+
+.mat-white-gold .material-header h4,
+.mat-white-gold .material-desc-static,
+.mat-white-gold .material-finish {
+    color: #222 !important;
+    text-shadow: none !important;
+}
+
+.mat-white-gold .material-purity {
+    color: #333 !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+
+/* Platinum: Cool Silver/White */
+.mat-platinum {
+    background: linear-gradient(135deg, #999999 0%, #e0e0e0 50%, #999999 100%) !important;
+    color: #333 !important;
+}
+
+.mat-platinum .material-header h4,
+.mat-platinum .material-desc-static,
+.mat-platinum .material-finish {
+    color: #222 !important;
+    text-shadow: none !important;
+}
+
+.mat-platinum .material-purity {
+    color: #333 !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+
+/* Black Gold: Deep metallic dark */
 .mat-black-gold {
-    border-left: 3px solid #333;
+    background: linear-gradient(135deg, #000000 0%, #434343 100%) !important;
+    border: 1px solid #444;
 }
 
+/* Ceramic: Clean glossy white */
 .mat-ceramic {
-    border-left: 3px solid #FFF;
+    background: linear-gradient(135deg, #e3e3e3 0%, #ffffff 50%, #e3e3e3 100%) !important;
+    color: #333 !important;
 }
 
+.mat-ceramic .material-header h4,
+.mat-ceramic .material-desc-static,
+.mat-ceramic .material-finish {
+    color: #222 !important;
+    text-shadow: none !important;
+}
+
+.mat-ceramic .material-purity {
+    color: #333 !important;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    background: rgba(0, 0, 0, 0.05) !important;
+}
+
+
+/* Diamond: Icy Blue */
 .mat-diamond {
-    border-left: 3px solid #B9F2FF;
+    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%) !important;
+    /* Or more crystal like */
+    background: linear-gradient(135deg, #a2d9ff 0%, #ffffff 50%, #a2d9ff 100%) !important;
+    color: #004e92 !important;
 }
 
-/* Subtle Hover Glows per material (Optional, kept minimal) */
-.mat-gold:hover {
-    box-shadow: 0 5px 20px rgba(255, 215, 0, 0.05);
+.mat-diamond .material-header h4,
+.mat-diamond .material-desc-static,
+.mat-diamond .material-finish {
+    color: #004e92 !important;
+    text-shadow: none !important;
 }
 
-.mat-diamond:hover {
-    box-shadow: 0 5px 20px rgba(185, 242, 255, 0.1);
+.mat-diamond .material-purity {
+    color: #004e92 !important;
+    border-color: rgba(0, 78, 146, 0.2) !important;
+    background: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* Process Description */
@@ -228,24 +311,42 @@
     margin-bottom: var(--spacing-md);
 }
 
-/* Mobile Adjustments */
-@media (max-width: 768px) {
-    .specs-grid {
-        grid-template-columns: repeat(2, 1fr);
-        gap: var(--spacing-sm);
+/* Mobile Adjustments & Breakpoints for "First 4 Items" logic */
+@media (max-width: 1200px) {
+
+    /* 3 Columns -> 4 items need 2 rows */
+    .materials-grid-wrapper {
+        max-height: 650px;
+    }
+}
+
+@media (max-width: 900px) {
+
+    /* 2 Columns -> 4 items need 2 rows */
+    .materials-grid-wrapper {
+        max-height: 650px;
+    }
+}
+
+@media (max-width: 600px) {
+
+    /* 1 Column -> 4 items need 4 rows */
+    .materials-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .materials-grid-wrapper {
+        max-height: 1270px;
+        /* 4 * (280 + 24) + padding */
     }
 
     .spec-card {
         padding: var(--spacing-sm);
     }
 
-    .materials-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .materials-grid-wrapper {
-        max-height: 340px;
-        /* 1 card on mobile */
+    .specs-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-sm);
     }
 
     .material-header h4 {

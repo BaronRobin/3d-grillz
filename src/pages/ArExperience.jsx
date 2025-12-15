@@ -160,10 +160,12 @@ const ArExperience = () => {
                             <li>iPhone 12 Pro / Pro Max (LiDAR)</li>
                             <li>iPhone 13 Pro / Pro Max</li>
                             <li>iPhone 14 Pro / Pro Max</li>
+                            <li>iPhone 15 Pro / Pro Max</li>
+                            <li>iPhone 16 Pro / Pro Max</li>
+                            <li>iPhone 17 Pro / Pro Max</li>
                             <li>iPad Pro (2020+)</li>
-                            <li>Samsung Galaxy S20+ / Ultra</li>
-                            <li>Google Pixel 5+</li>
-                            <li>Wait for more...</li>
+                            <li>Samsung Galaxy S20+ and newer</li>
+                            <li>Google Pixel 5 and newer</li>
                         </ul>
                     </div>
                 </div>

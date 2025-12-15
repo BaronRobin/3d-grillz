@@ -27,10 +27,13 @@ const Hero = () => {
                 </p>
 
                 <div className="hero-cta fade-in-up stagger-3">
-                    <Link to="/process" className="btn btn-primary">
+                    <button
+                        onClick={() => document.getElementById('process')?.scrollIntoView({ behavior: 'smooth' })}
+                        className="btn btn-primary"
+                    >
                         Explore the Pipeline
-                    </Link>
-                    <Link to="/craft" className="btn btn-secondary">
+                    </button>
+                    <Link to="/ar-experience" className="btn btn-secondary">
                         View AR Experience
                     </Link>
                 </div>

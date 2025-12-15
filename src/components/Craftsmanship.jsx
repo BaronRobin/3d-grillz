@@ -164,7 +164,7 @@ const Craftsmanship = () => {
                                     key={index}
                                     className="material-card-wrapper-static"
                                 >
-                                    <div className={`material-card-static glass ${material.className}`}>
+                                    <div className={`material-card-static ${material.className}`}>
                                         <div className="material-header">
                                             <h4>{material.name}</h4>
                                             <span className="material-purity">{material.purity}</span>
