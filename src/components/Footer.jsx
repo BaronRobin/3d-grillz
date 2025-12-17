@@ -46,7 +46,7 @@ const Footer = () => {
 
                 <div className="footer-bottom">
                     <p className="thesis-note" style={{ color: '#e0e0e0', fontSize: '0.85rem', letterSpacing: '1px', opacity: 0.8 }}>
-                        Bachelor's Thesis • Virtual Design • Hochschule Kaiserslautern
+                        Bachelor's Thesis | Virtual Design | Hochschule Kaiserslautern
                     </p>
                     <p style={{ color: '#666', fontSize: '0.75rem', marginTop: '0.5rem' }}>
                         &copy; {new Date().getFullYear()} Robin Baron. All Rights Reserved.

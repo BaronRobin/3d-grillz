@@ -61,7 +61,7 @@ const WebGLShowcase = () => {
                         </Canvas>
 
                         <div className="interaction-hint">
-                            <span>Drag to Rotate • Scroll to Zoom</span>
+                            <span>Drag to Rotate | Scroll to Zoom</span>
                         </div>
 
                         {/* Top Right Controls */}

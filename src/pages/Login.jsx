@@ -62,9 +62,9 @@ const Login = () => {
 
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#ccc' }}>Email</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#ccc' }}>Email or Username</label>
                         <input
-                            type="email"
+                            type="text"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
@@ -72,13 +72,13 @@ const Login = () => {
                                 width: '100%',
                                 padding: '0.75rem',
                                 borderRadius: '10px',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                background: 'rgba(0,0,0,0.2)',
+                                border: 'none',
+                                background: 'rgba(0,0,0,0.3)',
                                 color: 'white',
                                 outline: 'none',
                                 fontSize: '1rem'
                             }}
-                            placeholder="user@example.com"
+                            placeholder="user or user@example.com"
                         />
                     </div>
                     <div>
@@ -92,8 +92,8 @@ const Login = () => {
                                 width: '100%',
                                 padding: '0.75rem',
                                 borderRadius: '10px',
-                                border: '1px solid rgba(255,255,255,0.1)',
-                                background: 'rgba(0,0,0,0.2)',
+                                border: 'none',
+                                background: 'rgba(0,0,0,0.3)',
                                 color: 'white',
                                 outline: 'none',
                                 fontSize: '1rem'
