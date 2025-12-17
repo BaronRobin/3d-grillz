@@ -108,13 +108,40 @@ const Dashboard = () => {
                     </div>
 
                     <h4 style={{ marginBottom: '1rem', fontSize: '1rem' }}>Actions</h4>
-                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                        <Link to="/ar-experience" className="btn btn-secondary" style={{ flex: 1, textAlign: 'center', fontSize: '0.9rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        <Link to="/ar-experience" className="btn btn-primary" style={{ flex: 1, textAlign: 'center', fontSize: '0.9rem' }}>
                             Try in AR
                         </Link>
-                        <button className="btn btn-primary" style={{ flex: 1, fontSize: '0.9rem' }}>
-                            Contact Support
-                        </button>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                                className="btn btn-secondary"
+                                style={{
+                                    padding: '0.6rem 0.8rem',
+                                    fontSize: '1.2rem',
+                                    minWidth: 'auto',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                                title="Email Support"
+                            >
+                                ✉
+                            </button>
+                            <button
+                                className="btn btn-secondary"
+                                style={{
+                                    padding: '0.6rem 0.8rem',
+                                    fontSize: '1.2rem',
+                                    minWidth: 'auto',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}
+                                title="Call Support"
+                            >
+                                ☎
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
