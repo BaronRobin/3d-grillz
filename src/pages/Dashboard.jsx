@@ -85,15 +85,10 @@ const Dashboard = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
                 {/* 3D Preview */}
-                <div className="glass" style={{ padding: '0', overflow: 'hidden', minHeight: '400px', display: 'flex', flexDirection: 'column' }}>
-                    <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
-                        <h3 style={{ fontSize: '1.25rem' }}>Design Preview</h3>
-                    </div>
-                    <div style={{ flex: 1, position: 'relative' }}>
-                        {/* We repurpose the showcase but strip controls for a simpler view */}
-                        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-                            {/* Use iframe or component trick if WebGLShowcase is not flexible, 
-                                 but here we just drop the component in. Ideally we'd pass props to lock it. */}
+                <div className="glass" style={{ padding: '0', overflow: 'hidden', minHeight: '400px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ padding: '2rem', textAlign: 'center' }}>
+                        <h3 style={{ fontSize: '2rem', marginBottom: '2rem' }}>Interactive Showcase</h3>
+                        <div style={{ position: 'relative', width: '100%', height: '300px' }}>
                             <WebGLShowcase />
                         </div>
                     </div>

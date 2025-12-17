@@ -111,12 +111,6 @@ const Login = () => {
                         {isLoggingIn ? 'Signing In...' : 'Sign In'}
                     </button>
                 </form>
-
-                <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.85rem', color: '#888' }}>
-                    <p>Demo Accounts:</p>
-                    <p>User: user@grillz.com / password</p>
-                    <p>Admin: admin@grillz.com / password</p>
-                </div>
             </div>
         </div>
     );

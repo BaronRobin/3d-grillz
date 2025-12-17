@@ -48,6 +48,14 @@
     gap: 2rem;
 }
 
+.nav-item::before {
+    content: none !important;
+}
+
+.nav-item + .nav-item::before {
+    content: none !important;
+}
+
 .nav-link-btn,
 .nav-link {
     background: none;

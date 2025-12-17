@@ -41,7 +41,14 @@ export const AuthProvider = ({ children }) => {
         return new Promise((resolve, reject) => {
             setTimeout(() => {
                 if (email && password) {
-                    const role = email.includes('admin') ? 'admin' : 'user';
+                    // Determine role based on email
+                    let role = 'user';
+                    if (email.includes('admin')) {
+                        role = 'admin';
+                    } else if (email.includes('vip')) {
+                        role = 'vip';
+                    }
+
                     const newUser = {
                         email,
                         role,

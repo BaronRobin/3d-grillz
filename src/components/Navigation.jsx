@@ -41,7 +41,7 @@ const Navigation = () => {
         <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
             <div className="nav-container">
                 <Link to="/" className="nav-logo" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-                    GRILLZ<span className="logo-dot">.</span>
+                    {/* Logo removed per user request */}
                 </Link>
 
                 <div className="menu-icon" onClick={toggleMenu}>
