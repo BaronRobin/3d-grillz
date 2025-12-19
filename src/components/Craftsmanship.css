@@ -311,6 +311,87 @@
     margin-bottom: var(--spacing-md);
 }
 
+
+/* --- 3D Interactive Material Cards --- */
+
+.material-card-wrapper-3d {
+    perspective: 1000px;
+    /* Essential for 3D effect */
+    height: 320px;
+    /* Slightly taller to accommodate movement */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.material-card-3d {
+    width: 100%;
+    height: 280px;
+    border-radius: 20px;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    /* Smooth transition for reset, removed by JS/hover for instant tracking */
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transform-style: preserve-3d;
+    box-shadow:
+        0 20px 40px -10px rgba(0, 0, 0, 0.4),
+        0 0 20px rgba(255, 255, 255, 0.05) inset;
+    /* Soft inner glow */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-size: 200% 200%;
+    /* For potential gradient movement */
+    overflow: hidden;
+    /* Keep glare inside */
+    cursor: default;
+}
+
+.material-card-3d .material-content {
+    transform: translateZ(30px);
+    /* Pushes text forward */
+    pointer-events: none;
+    /* Let mouse events pass through to card */
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    z-index: 2;
+}
+
+/* Glare/Sheen Effect */
+.material-card-glare {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+            rgba(255, 255, 255, 0.4) 0%,
+            rgba(255, 255, 255, 0.0) 60%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    mix-blend-mode: overlay;
+    pointer-events: none;
+    z-index: 5;
+    transform: translateZ(1px);
+}
+
+/* Hover State */
+.material-card-wrapper-3d:hover .material-card-3d {
+    transition: none;
+    /* remove transition for instant follow */
+}
+
+.material-card-wrapper-3d:hover .material-card-glare {
+    opacity: 1;
+}
+
+.material-card-wrapper-3d:hover .material-card-3d {
+    box-shadow:
+        0 40px 70px -15px rgba(0, 0, 0, 0.6),
+        0 0 30px rgba(255, 255, 255, 0.1) inset;
+}
+
 /* Mobile Adjustments & Breakpoints for "First 4 Items" logic */
 @media (max-width: 1200px) {
 

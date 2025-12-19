@@ -46,6 +46,64 @@ const CountUp = ({ start = 0, end, duration = 2000, suffix = '', prefix = '', de
     );
 };
 
+/* 3D Material Card Component */
+const Material3DCard = ({ material }) => {
+    const cardRef = useRef(null);
+    const [style, setStyle] = useState({});
+
+    const handleMouseMove = (e) => {
+        if (!cardRef.current) return;
+
+        const card = cardRef.current;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+
+        // Calculate rotation: Max +/- 12 degrees for "tvOS" feel
+        const rotateX = ((y - centerY) / centerY) * -12;
+        const rotateY = ((x - centerX) / centerX) * 12;
+
+        setStyle({
+            transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+            '--mouse-x': `${x}px`,
+            '--mouse-y': `${y}px`
+        });
+    };
+
+    const handleMouseLeave = () => {
+        setStyle({
+            transform: 'rotateX(0deg) rotateY(0deg)',
+            '--mouse-x': '50%',
+            '--mouse-y': '50%'
+        });
+    };
+
+    return (
+        <div className="material-card-wrapper-3d">
+            <div
+                ref={cardRef}
+                className={`material-card-3d ${material.className}`}
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                style={style}
+            >
+                <div className="material-card-glare"></div>
+                <div className="material-content">
+                    <div className="material-header">
+                        <h4>{material.name}</h4>
+                        <span className="material-purity">{material.purity}</span>
+                    </div>
+                    <div className="material-finish">{material.finish}</div>
+                    <p className="material-desc-static">{material.desc}</p>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const Craftsmanship = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [showAllMaterials, setShowAllMaterials] = useState(false);
@@ -160,18 +218,8 @@ const Craftsmanship = () => {
                     <div className={`materials-grid-wrapper ${showAllMaterials ? 'expanded' : ''}`}>
                         <div className="materials-grid">
                             {allMaterials.map((material, index) => (
-                                <div
-                                    key={index}
-                                    className="material-card-wrapper-static"
-                                >
-                                    <div className={`material-card-static ${material.className}`}>
-                                        <div className="material-header">
-                                            <h4>{material.name}</h4>
-                                            <span className="material-purity">{material.purity}</span>
-                                        </div>
-                                        <div className="material-finish">{material.finish}</div>
-                                        <p className="material-desc-static">{material.desc}</p>
-                                    </div>
+                                <div key={index} className="fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                                    <Material3DCard material={material} />
                                 </div>
                             ))}
                         </div>
