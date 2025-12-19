@@ -51,6 +51,27 @@ const Material3DCard = ({ material }) => {
     const cardRef = useRef(null);
     const [style, setStyle] = useState({});
 
+    // Gyroscope Effect for Mobile
+    const handleOrientation = (e) => {
+        const { beta, gamma } = e;
+        if (beta === null || gamma === null) return;
+
+        const xOffset = Math.min(Math.max(beta - 45, -20), 20);
+        const yOffset = Math.min(Math.max(gamma, -20), 20);
+
+        const rotateX = xOffset * -1;
+        const rotateY = yOffset;
+
+        const mouseX = 50 + (yOffset * 2);
+        const mouseY = 50 + (xOffset * 2);
+
+        setStyle({
+            transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
+            '--mouse-x': `${mouseX}%`,
+            '--mouse-y': `${mouseY}%`
+        });
+    };
+
     const handleMouseMove = (e) => {
         if (!cardRef.current) return;
 
@@ -81,66 +102,36 @@ const Material3DCard = ({ material }) => {
         });
     };
 
-    // Gyroscope Effect for Mobile
     useEffect(() => {
-        const handleOrientation = (e) => {
-            // Check if user is hovering with mouse (desktop priority) to avoid conflict
-            // Simple heuristic: if we recently had a mouse event, ignore gyro? 
-            // Or just let both work. Mobile usually doesn't have mouse move.
-
-            const { beta, gamma } = e; // beta: front/back (-180,180), gamma: left/right (-90,90)
-
-            if (beta === null || gamma === null) return;
-
-            // Clamp and scale
-            // Beta (X-axis tilt): usually held around 45deg? 
-            // Let's assume holding phone at ~45deg is "flat".
-            // We want +/- 15 deg tilt from that "zero".
-            const xOffset = Math.min(Math.max(beta - 45, -20), 20);
-            const yOffset = Math.min(Math.max(gamma, -20), 20);
-
-            // Invert for natural feel? 
-            // If I tilt phone right (gamma positive), card should tilt right (rotateY positive).
-
-            const rotateX = xOffset * -1; // Invert beta for matching look logic
-            const rotateY = yOffset;
-
-            // Map light source slightly differently for mobile
-            // 20deg tilt -> 100% / 0% on gradient
-            const mouseX = 50 + (yOffset * 2);
-            const mouseY = 50 + (xOffset * 2);
-
-            setStyle({
-                transform: `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`,
-                '--mouse-x': `${mouseX}%`,
-                '--mouse-y': `${mouseY}%`
-            });
-        };
-
-        // iOS 13+ Permissions check
-        const requestMotionPermission = async () => {
-            if (
-                typeof DeviceOrientationEvent !== 'undefined' &&
-                typeof DeviceOrientationEvent.requestPermission === 'function'
-            ) {
-                // We cannot auto-call this. It must be user triggered.
-                // For now, we just add the listener if allowed, or if not, we wait by design.
-                // We will rely on the user potentially tapping something else or we accept passive support.
-                // However, to make it work "magically" we'll try adding the listener.
-                // If it fails silently, so be it. 
-            }
+        // Auto-add listener if permission is NOT required (Android, older iOS)
+        if (
+            typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission !== 'function'
+        ) {
             window.addEventListener('deviceorientation', handleOrientation);
-        };
-
-        requestMotionPermission();
+        }
 
         return () => {
             window.removeEventListener('deviceorientation', handleOrientation);
         };
     }, []);
 
+    const handleCardClick = async () => {
+        // Request permission on click for iOS 13+
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permissionState = await DeviceOrientationEvent.requestPermission();
+                if (permissionState === 'granted') {
+                    window.addEventListener('deviceorientation', handleOrientation);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
+
     return (
-        <div className="material-card-wrapper-3d">
+        <div className="material-card-wrapper-3d" onClick={handleCardClick}>
             <div
                 ref={cardRef}
                 className="material-card-3d"
