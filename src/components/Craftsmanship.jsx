@@ -47,7 +47,7 @@ const CountUp = ({ start = 0, end, duration = 2000, suffix = '', prefix = '', de
 };
 
 /* 3D Material Card Component */
-const Material3DCard = ({ material }) => {
+const Material3DCard = ({ material, isGyroEnabled, onRequestPermission }) => {
     const cardRef = useRef(null);
     const [style, setStyle] = useState({});
 
@@ -103,35 +103,20 @@ const Material3DCard = ({ material }) => {
     };
 
     useEffect(() => {
-        // Auto-add listener if permission is NOT required (Android, older iOS)
-        if (
-            typeof DeviceOrientationEvent !== 'undefined' &&
-            typeof DeviceOrientationEvent.requestPermission !== 'function'
-        ) {
+        if (isGyroEnabled) {
             window.addEventListener('deviceorientation', handleOrientation);
         }
 
         return () => {
             window.removeEventListener('deviceorientation', handleOrientation);
         };
-    }, []);
-
-    const handleCardClick = async () => {
-        // Request permission on click for iOS 13+
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            try {
-                const permissionState = await DeviceOrientationEvent.requestPermission();
-                if (permissionState === 'granted') {
-                    window.addEventListener('deviceorientation', handleOrientation);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    };
+    }, [isGyroEnabled]);
 
     return (
-        <div className="material-card-wrapper-3d" onClick={handleCardClick}>
+        <div
+            className="material-card-wrapper-3d"
+            onClick={onRequestPermission} /* Global request trigger */
+        >
             <div
                 ref={cardRef}
                 className="material-card-3d"
@@ -161,6 +146,32 @@ const Material3DCard = ({ material }) => {
 const Craftsmanship = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [showAllMaterials, setShowAllMaterials] = useState(false);
+    const [isGyroEnabled, setIsGyroEnabled] = useState(false);
+
+    // Initial check for non-iOS devices
+    useEffect(() => {
+        if (
+            typeof DeviceOrientationEvent !== 'undefined' &&
+            typeof DeviceOrientationEvent.requestPermission !== 'function'
+        ) {
+            // If permission API doesn't exist (Android/Desktop), we assume enabled
+            setIsGyroEnabled(true);
+        }
+    }, []);
+
+    const handlePermissionRequest = async () => {
+        // Only needed if not already enabled and if API exists (iOS)
+        if (!isGyroEnabled && typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            try {
+                const permissionState = await DeviceOrientationEvent.requestPermission();
+                if (permissionState === 'granted') {
+                    setIsGyroEnabled(true);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        }
+    };
 
     const specs = [
         { label: 'Production Time', end: 3, suffix: ' months', icon: '⏱️' },
@@ -273,7 +284,11 @@ const Craftsmanship = () => {
                         <div className="materials-grid">
                             {allMaterials.map((material, index) => (
                                 <div key={index} className="fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
-                                    <Material3DCard material={material} />
+                                    <Material3DCard
+                                        material={material}
+                                        isGyroEnabled={isGyroEnabled}
+                                        onRequestPermission={handlePermissionRequest}
+                                    />
                                 </div>
                             ))}
                         </div>
