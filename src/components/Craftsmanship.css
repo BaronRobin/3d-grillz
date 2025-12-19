@@ -328,34 +328,48 @@
     width: 100%;
     height: 280px;
     border-radius: 20px;
-    padding: 2rem;
+    /* Removed padding from here, padding belongs to content now to avoid layout issues */
     display: flex;
     flex-direction: column;
     position: relative;
-    /* Smooth transition for reset, removed by JS/hover for instant tracking */
-    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    transition: transform 0.1s cubic-bezier(0.23, 1, 0.32, 1);
     transform-style: preserve-3d;
+    /* Removed box-shadow/border/background from here - moved to bg layer */
+    cursor: default;
+    /* IMPORTANT: No overflow hidden here! */
+}
+
+/* Background Layer (Clipped) */
+.material-layer-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    /* Clips the glare */
+    z-index: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow:
         0 20px 40px -10px rgba(0, 0, 0, 0.4),
         0 0 20px rgba(255, 255, 255, 0.05) inset;
-    /* Soft inner glow */
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background-size: 200% 200%;
-    /* For potential gradient movement */
-    overflow: hidden;
-    /* Keep glare inside */
-    cursor: default;
+    transform: translateZ(0);
+    /* Base plane */
+    transition: box-shadow 0.4s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .material-card-3d .material-content {
-    transform: translateZ(30px);
-    /* Pushes text forward */
+    transform: translateZ(40px) scale(0.9);
+    /* Float above, scale down slightly to fit */
     pointer-events: none;
-    /* Let mouse events pass through to card */
     display: flex;
     flex-direction: column;
     height: 100%;
     z-index: 2;
+    position: relative;
+    padding: 2rem;
+    /* moved padding here */
 }
 
 /* Glare/Sheen Effect */
@@ -386,9 +400,9 @@
     opacity: 1;
 }
 
-.material-card-wrapper-3d:hover .material-card-3d {
+.material-card-wrapper-3d:hover .material-layer-bg {
     box-shadow:
-        0 40px 70px -15px rgba(0, 0, 0, 0.6),
+        0 50px 80px -20px rgba(0, 0, 0, 0.7),
         0 0 30px rgba(255, 255, 255, 0.1) inset;
 }
 

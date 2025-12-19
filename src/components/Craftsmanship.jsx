@@ -85,12 +85,17 @@ const Material3DCard = ({ material }) => {
         <div className="material-card-wrapper-3d">
             <div
                 ref={cardRef}
-                className={`material-card-3d ${material.className}`}
+                className="material-card-3d"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
                 style={style}
             >
-                <div className="material-card-glare"></div>
+                {/* Background Layer with Glare - Clipped */}
+                <div className={`material-layer-bg ${material.className}`}>
+                    <div className="material-card-glare"></div>
+                </div>
+
+                {/* Content Layer - Floating */}
                 <div className="material-content">
                     <div className="material-header">
                         <h4>{material.name}</h4>
