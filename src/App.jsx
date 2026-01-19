@@ -65,7 +65,19 @@ const AppContent = () => {
   );
 };
 
+
+// Import the custom hook
+import useAnimatedFavicon from './hooks/useAnimatedFavicon';
+
 function App() {
+  // Placeholder frames for now. 
+  // User will provide numbered frames (e.g., favicon-0.png, favicon-1.png... favicon-10.png)
+  // We'll generate the array dynamically based on a count.
+  const frameCount = 10; // Adjust this number based on actual frames provided
+  const faviconFrames = Array.from({ length: frameCount }, (_, i) => `/favicon-${i}.webp`);
+
+  useAnimatedFavicon(faviconFrames, 100); // Faster interval for smooth animation
+
   return (
     <Router>
       <AppProviders>
