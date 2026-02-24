@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { FaSquare } from 'react-icons/fa';
+import { FiChevronDown } from 'react-icons/fi';
 import './Craftsmanship.css';
 
 /**

@@ -73,10 +73,10 @@ export const AnalyticsProvider = ({ children, user }) => {
             });
 
             const data = await response.json();
-            console.log('✅ Logs sent to Pi:', data);
+            console.log('Success! Logs sent to Pi:', data);
             return data;
         } catch (error) {
-            console.error('❌ Failed to send logs to Pi:', error);
+            console.error('Failed to send logs to Pi:', error);
             return { success: false, error: error.message };
         }
     };

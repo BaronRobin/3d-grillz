@@ -136,11 +136,11 @@ const AdminDashboard = () => {
                                 onClick={async () => {
                                     setPiStatus('Sending...');
                                     const result = await sendLogsToPi();
-                                    setPiStatus(result.success ? '✅ Sent to Pi!' : '❌ Failed');
+                                    setPiStatus(result.success ? 'Success! Sent to Pi.' : 'Failed to send.');
                                     setTimeout(() => setPiStatus(null), 3000);
                                 }}
                             >
-                                📤 Send to Pi
+                                Send to Pi
                             </button>
                         </div>
                         {piStatus && <div style={{ marginBottom: '1rem', padding: '0.5rem', background: 'rgba(201, 169, 97, 0.1)', borderRadius: '5px', textAlign: 'center', fontSize: '0.9rem' }}>{piStatus}</div>}

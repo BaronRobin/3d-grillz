@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Shop.css';
 import WebGLShowcase from '../components/WebGLShowcase';
@@ -10,7 +11,8 @@ const Shop = () => {
     const [email, setEmail] = useState('');
     const [isSubmitted, setIsSubmitted] = useState(false);
 
-    const { createOrder } = useAuth();
+    const { submitQuoteRequest } = useAuth();
+    const navigate = useNavigate();
 
     const materials = [
         { id: 'gold', name: '18K Solid Gold', color: '#eec95e', roughness: 0.1 },
@@ -25,15 +27,19 @@ const Shop = () => {
         <div className="shop-container fade-in page-transition">
             {isSubmitted && (
                 <div className="success-popup-overlay fade-in">
-                    <div className="success-popup glass-panel slide-up">
-                        <div className="popup-icon">✨</div>
+                    <div className="success-popup slide-up">
+                        <div className="popup-icon">
+                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
                         <h2>Request Submitted</h2>
                         <p className="popup-greeting">Thank you, {name}!</p>
                         <p>Your custom quote request has been successfully received by our design team.</p>
                         <p className="popup-highlight">
                             Please keep an eye on your mailbox (and junk folder) as we will be sending your login data and quote details shortly.
                         </p>
-                        <button className="btn btn-primary" onClick={() => window.location.href = '/'}>Return Home</button>
+                        <button className="btn btn-primary" onClick={() => navigate('/')}>Return Home</button>
                     </div>
                 </div>
             )}
@@ -105,10 +111,12 @@ const Shop = () => {
                             * Note: Depending on the current amount of orders, processing time can take up to 1 week. Pricing varies based on individual customizations.
                         </p>
                         <button
+                            type="button"
                             className="btn btn-primary full-width"
-                            disabled={comments.trim().length < 5 || name.trim().length === 0 || !email.includes('@')}
-                            onClick={() => {
-                                createOrder(email, {
+                            disabled={comments.trim().length < 5 || name.trim().length === 0 || !email.includes('@') || !email.includes('.') || email.split('.').pop().length < 2}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                submitQuoteRequest(email, {
                                     name: name,
                                     materialId: selectedMaterial,
                                     comments: comments

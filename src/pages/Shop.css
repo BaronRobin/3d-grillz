@@ -19,19 +19,21 @@
 }
 
 .shop-grid {
-    display: grid;
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(0, 1fr);
+    display: flex;
+    flex-direction: column;
     gap: 3rem;
     flex-grow: 1;
-    overflow: hidden;
+    overflow-y: auto; /* allow page scrolling on mobile */
     min-height: 0;
 }
 
 @media (min-width: 992px) {
     .shop-grid {
+        display: grid;
         grid-template-columns: 3fr 2fr;
+        grid-template-rows: minmax(0, 1fr);
         align-items: stretch;
+        overflow: hidden; /* static lock on desktop */
     }
 }
 
@@ -47,8 +49,7 @@
     border-radius: 20px;
     overflow: hidden;
     flex-grow: 1;
-    height: 100%;
-    /* Adjusting the WebGL showcase to fit inside the shop panel nicely */
+    min-height: 400px;
 }
 
 .shop-viewer-wrapper .webgl-container {
@@ -59,26 +60,33 @@
 
 /* Right Configurator */
 .shop-configurator {
-    padding: 2rem;
-    overflow-y: auto;
-    height: 100%;
-    min-height: 0;
-    /* Custom scrollbar for webkit */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    padding: 1rem;
+    height: auto;
 }
 
-.shop-configurator::-webkit-scrollbar {
-    width: 6px;
-}
+@media (min-width: 992px) {
+    .shop-configurator {
+        padding: 2rem;
+        overflow-y: auto;
+        height: 100%;
+        min-height: 0;
+        /* Custom scrollbar for webkit */
+        scrollbar-width: thin;
+        scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+    }
 
-.shop-configurator::-webkit-scrollbar-track {
-    background: transparent;
-}
+    .shop-configurator::-webkit-scrollbar {
+        width: 6px;
+    }
 
-.shop-configurator::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+    .shop-configurator::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .shop-configurator::-webkit-scrollbar-thumb {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
 }
 
 /* Right Configurator */
@@ -197,11 +205,15 @@
     text-align: center;
     border-radius: 20px;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #0a0a0a;
+    box-shadow: 0 40px 60px rgba(0,0,0,0.8);
 }
 
 .popup-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    color: var(--text-accent);
 }
 
 .popup-greeting {

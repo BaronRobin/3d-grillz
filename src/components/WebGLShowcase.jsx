@@ -56,8 +56,8 @@ const WebGLShowcase = ({ forcedMaterial, hideHeader = false }) => {
     const prevDesign = () => setIndex((prev) => (prev - 1 + designs.length) % designs.length);
 
     return (
-        <section className={`webgl-section section ${hideHeader ? 'no-padding' : ''}`} id="showcase">
-            <div className="container" style={hideHeader ? { height: '100%', display: 'flex', flexDirection: 'column' } : {}}>
+        <section className={`webgl-section section ${hideHeader ? 'no-padding' : ''}`} id="showcase" style={hideHeader ? { background: 'transparent' } : {}}>
+            <div className="container" style={hideHeader ? { height: '100%', display: 'flex', flexDirection: 'column', padding: 0 } : {}}>
                 {!hideHeader && (
                     <div className="section-header fade-in-up">
                         <h2 style={{ marginBottom: 0 }}>Interactive Showcase</h2>

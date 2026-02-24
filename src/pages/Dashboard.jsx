@@ -2,6 +2,7 @@ import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, Navigate } from 'react-router-dom';
 import WebGLShowcase from '../components/WebGLShowcase';
+import { FiMail, FiPhone } from 'react-icons/fi';
 
 /**
  * Customer Dashboard Page displaying order status and details.
@@ -102,6 +103,10 @@ const Dashboard = () => {
                             <span style={{ color: '#888' }}>Model Type</span>
                             <span>{['Custom Molded Gold', 'Classic Grill', 'Diamond Cut'][order.modelType]}</span>
                         </div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', color: '#ccc' }}>
+                            <FiMail size={18} />
+                            <span>{user.email}</span>
+                        </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', paddingBottom: '0.5rem', borderBottom: '1px solid #333' }}>
                             <span style={{ color: '#888' }}>Material</span>
                             <span>18k Yellow Gold</span>
@@ -130,7 +135,7 @@ const Dashboard = () => {
                                 }}
                                 title="Email Support"
                             >
-                                ✉
+                                <FiMail />
                             </button>
                             <button
                                 className="btn btn-secondary"
@@ -144,7 +149,7 @@ const Dashboard = () => {
                                 }}
                                 title="Call Support"
                             >
-                                ☎
+                                <FiPhone />
                             </button>
                         </div>
                     </div>
