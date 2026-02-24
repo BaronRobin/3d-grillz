@@ -3,6 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import '../App.css'; // Ensure we have access to glass classes
 
+/**
+ * Login Page for user authentication.
+ * Redirects to specific dashboards based on user role upon success.
+ * @returns {JSX.Element}
+ */
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');

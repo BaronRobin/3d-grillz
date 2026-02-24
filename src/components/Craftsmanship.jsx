@@ -2,7 +2,17 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaSquare } from 'react-icons/fa';
 import './Craftsmanship.css';
 
-// Simple CountUp Component
+/**
+ * Simple CountUp Component for animating numbers.
+ * @param {Object} props - Component props.
+ * @param {number} [props.start=0] - Starting number.
+ * @param {number} props.end - Ending number.
+ * @param {number} [props.duration=2000] - Animation duration in milliseconds.
+ * @param {string} [props.suffix=''] - String to append to the number.
+ * @param {string} [props.prefix=''] - String to prepend to the number.
+ * @param {number} [props.decimals=0] - Number of decimal places.
+ * @returns {JSX.Element}
+ */
 const CountUp = ({ start = 0, end, duration = 2000, suffix = '', prefix = '', decimals = 0 }) => {
     const [count, setCount] = useState(start);
     const elementRef = useRef(null);
@@ -46,7 +56,14 @@ const CountUp = ({ start = 0, end, duration = 2000, suffix = '', prefix = '', de
     );
 };
 
-/* 3D Material Card Component */
+/**
+ * 3D Material Card Component with gyroscope support for mobile.
+ * @param {Object} props - Component props.
+ * @param {Object} props.material - Material data object.
+ * @param {boolean} props.isGyroEnabled - Whether device orientation is enabled.
+ * @param {Function} props.onRequestPermission - Function to request gyro permission.
+ * @returns {JSX.Element}
+ */
 const Material3DCard = ({ material, isGyroEnabled, onRequestPermission }) => {
     const cardRef = useRef(null);
     const [style, setStyle] = useState({});
@@ -162,6 +179,10 @@ const Material3DCard = ({ material, isGyroEnabled, onRequestPermission }) => {
     );
 };
 
+/**
+ * Craftsmanship Component displaying specs, materials, and process details.
+ * @returns {JSX.Element}
+ */
 const Craftsmanship = () => {
     const [showDetails, setShowDetails] = useState(false);
     const [showAllMaterials, setShowAllMaterials] = useState(false);
@@ -193,9 +214,9 @@ const Craftsmanship = () => {
     };
 
     const specs = [
-        { label: 'Production Time', end: 3, suffix: ' months', icon: '⏱️' },
-        { label: 'Working Hours', end: 480, suffix: ' hrs', icon: '⚙️' },
-        { label: 'Precision', start: 10, end: 0.01, suffix: ' mm', icon: '🎯', decimals: 2 }
+        { label: 'Production Time', end: 3, suffix: ' months', icon: '' },
+        { label: 'Working Hours', end: 480, suffix: ' hrs', icon: '' },
+        { label: 'Precision', start: 10, end: 0.01, suffix: ' mm', icon: '', decimals: 2 }
     ];
 
     const allMaterials = [

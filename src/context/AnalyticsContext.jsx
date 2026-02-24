@@ -3,6 +3,14 @@ import { useLocation } from 'react-router-dom';
 
 const AnalyticsContext = createContext(null);
 
+/**
+ * Analytics Provider component that tracks page views and clicks.
+ * Sends data to a mock backend on the Raspberry Pi.
+ * @param {Object} props - Component props.
+ * @param {React.ReactNode} props.children - Child components to wrap.
+ * @param {Object} props.user - The currently authenticated user.
+ * @returns {JSX.Element}
+ */
 export const AnalyticsProvider = ({ children, user }) => {
     const location = useLocation();
     const [clickLog, setClickLog] = useState([]);

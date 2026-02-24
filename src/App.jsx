@@ -8,6 +8,7 @@ import ArExperience from './pages/ArExperience';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import Shop from './pages/Shop'; // Import the new Shop component
 import CustomCursor from './components/CustomCursor';
 import BackToTop from './components/BackToTop';
 import { AuthProvider } from './context/AuthContext';
@@ -15,7 +16,6 @@ import { AnalyticsProvider } from './context/AnalyticsContext';
 import { useAuth } from './context/AuthContext'; // Import hook to pass user to Analytics
 import './App.css';
 import './styles/animations.css';
-import MobileTabBar from './components/MobileTabBar';
 
 // Wrapper to pass auth user to analytics
 const AppProviders = ({ children }) => {
@@ -41,7 +41,7 @@ const AppContent = () => {
   const location = useLocation();
 
   // Pages where footer should be hidden
-  const hideFooterRoutes = ['/login', '/dashboard', '/admin', '/ar-experience'];
+  const hideFooterRoutes = ['/login', '/dashboard', '/admin', '/ar-experience', '/shop'];
   const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (
@@ -57,8 +57,8 @@ const AppContent = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/shop" element={<Shop />} /> {/* Add Shop route */}
         </Routes>
-        <MobileTabBar />
         {!shouldHideFooter && <Footer />}
       </div>
     </>

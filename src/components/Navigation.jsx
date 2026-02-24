@@ -56,6 +56,9 @@ const Navigation = () => {
                         <span className="nav-link" onClick={() => handleNavClick('craft')}>Craft</span>
                     </li>
                     <li className="nav-item">
+                        <Link to="/shop" className="nav-link" onClick={() => setIsOpen(false)}>Shop</Link>
+                    </li>
+                    <li className="nav-item">
                         <Link to="/about" className="nav-link" onClick={() => setIsOpen(false)}>About</Link>
                     </li>
 

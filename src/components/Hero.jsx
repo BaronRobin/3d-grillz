@@ -17,13 +17,11 @@ const Hero = () => {
 
             <div className="hero-content container">
                 <h1 className="hero-title fade-in-up">
-                    Behind the Design:<br />
                     <span className="gradient-text">3D Custom Grillz</span>
                 </h1>
 
                 <p className="hero-subtitle fade-in-up stagger-2">
-                    A digital pipeline merging traditional craftsmanship with cutting-edge technology.
-                    <br />From 3D scanning to AR visualization – redefining wearable artistry.
+                    Bespoke 3D-modeled grillz, seamlessly bridging augmented reality with physical craftsmanship.
                 </p>
 
                 <div className="hero-cta fade-in-up stagger-3">

@@ -3,6 +3,11 @@ import { Link } from 'react-router-dom';
 import { FaMobileAlt, FaTimes, FaCamera } from 'react-icons/fa';
 import '../App.css';
 
+/**
+ * AR Try-On Experience Page. Handles camera permissions and rendering the camera feed.
+ * Requires a compatible mobile device.
+ * @returns {JSX.Element}
+ */
 const ArExperience = () => {
     const [isMobile, setIsMobile] = useState(false);
     const [showDevicePopup, setShowDevicePopup] = useState(false);

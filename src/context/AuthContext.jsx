@@ -22,6 +22,12 @@ const INITIAL_ORDERS = {
     }
 };
 
+/**
+ * Authentication Provider component that manages user state and mock order data.
+ * @param {Object} props - Component props.
+ * @param {React.ReactNode} props.children - Child components to wrap.
+ * @returns {JSX.Element}
+ */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [orders, setOrders] = useState(INITIAL_ORDERS); // "Database" state
@@ -81,6 +87,19 @@ export const AuthProvider = ({ children }) => {
         }));
     };
 
+    // User Action: Create Order
+    const createOrder = (userEmail, orderDetails) => {
+        setOrders(prev => ({
+            ...prev,
+            [userEmail]: {
+                stage: 0, // 0: Scanned / Order Received
+                history: [{ stage: 'Order Placed', date: new Date().toLocaleDateString() }],
+                modelType: orderDetails.materialId === 'gold' ? 0 : 1, // Mock logic
+                ...orderDetails
+            }
+        }));
+    };
+
     const getUserOrder = (email) => {
         return orders[email] || {
             stage: 1,
@@ -97,6 +116,7 @@ export const AuthProvider = ({ children }) => {
             logout,
             orders,
             updateOrderStatus,
+            createOrder,
             getUserOrder
         }}>
             {children}

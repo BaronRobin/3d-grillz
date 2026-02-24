@@ -1,6 +1,10 @@
 import React from 'react';
 import './AboutMe.css';
 
+/**
+ * AboutMe Component displaying the creator's information and skills.
+ * @returns {JSX.Element}
+ */
 const AboutMe = () => {
     return (
         <section className="about-section section" id="about">
@@ -15,7 +19,6 @@ const AboutMe = () => {
                             <div className="about-photo-mini">
                                 {/* Placeholder for user photo */}
                                 <div className="photo-placeholder-mini">
-                                    <span style={{ fontSize: '2rem' }}>👤</span>
                                 </div>
                             </div>
                         </div>

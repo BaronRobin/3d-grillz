@@ -2,6 +2,10 @@ import React from 'react';
 import './DigitalPipeline.css';
 // Icons removed as requested
 
+/**
+ * DigitalPipeline Component displaying the steps of the digital workflow.
+ * @returns {JSX.Element}
+ */
 const DigitalPipeline = () => {
     const pipelineSteps = [
         {
@@ -18,15 +22,15 @@ const DigitalPipeline = () => {
         },
         {
             number: '03',
-            title: 'Fabrication',
-            description: 'Additive manufacturing through SLA printing or direct metal laser sintering brings digital designs into physical reality.',
-            tech: ['SLA Printing', 'DMLS', 'Investment Casting']
-        },
-        {
-            number: '04',
             title: 'AR Visualization',
             description: 'Unreal Engine and ARKit enable real-time preview with photorealistic materials and spatial tracking for immersive visualization.',
             tech: ['Unreal Engine', 'ARKit', 'PBR Materials']
+        },
+        {
+            number: '04',
+            title: 'Fabrication',
+            description: 'Additive manufacturing through SLA printing or direct metal laser sintering brings digital designs into physical reality.',
+            tech: ['SLA Printing', 'DMLS', 'Investment Casting']
         },
         {
             number: '05',

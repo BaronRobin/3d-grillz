@@ -1,6 +1,10 @@
 import React from 'react';
 import './BehindTheDesign.css';
 
+/**
+ * BehindTheDesign Component detailing the inspiration and process behind the grillz.
+ * @returns {JSX.Element}
+ */
 const BehindTheDesign = () => {
     return (
         <section className="behind-design section" id="behind-design">

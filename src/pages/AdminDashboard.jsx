@@ -3,6 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { Navigate } from 'react-router-dom';
 
+/**
+ * Admin Panel for managing orders and viewing live analytics.
+ * Accessible only to users with the 'admin' role.
+ * @returns {JSX.Element}
+ */
 const AdminDashboard = () => {
     const { user, orders, updateOrderStatus } = useAuth();
     const { getLiveFeed, onlineUsers, sendLogsToPi } = useAnalytics();

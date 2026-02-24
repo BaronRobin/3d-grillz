@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from 'react';
 
+/**
+ * CustomCursor Component replaces the default cursor with an animated dot and ring.
+ * Disables itself on mobile devices.
+ * @returns {JSX.Element|null}
+ */
 const CustomCursor = () => {
     const [position, setPosition] = useState({ x: 0, y: 0 });
     const [hidden, setHidden] = useState(false);

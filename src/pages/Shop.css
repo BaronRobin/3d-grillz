@@ -1,0 +1,246 @@
+.shop-container {
+    padding-top: 100px; /* Account for navbar */
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 2rem;
+}
+
+.shop-header {
+    text-align: center;
+    margin-bottom: 2rem;
+    flex-shrink: 0;
+}
+
+.shop-header h1 {
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    margin-bottom: 0.5rem;
+}
+
+.shop-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr);
+    gap: 3rem;
+    flex-grow: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+@media (min-width: 992px) {
+    .shop-grid {
+        grid-template-columns: 3fr 2fr;
+        align-items: stretch;
+    }
+}
+
+/* Left Visuals */
+.shop-visuals {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.shop-viewer-wrapper {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    flex-grow: 1;
+    height: 100%;
+    /* Adjusting the WebGL showcase to fit inside the shop panel nicely */
+}
+
+.shop-viewer-wrapper .webgl-container {
+    padding: 0;
+    height: 100%;
+    min-height: unset;
+}
+
+/* Right Configurator */
+.shop-configurator {
+    padding: 2rem;
+    overflow-y: auto;
+    height: 100%;
+    min-height: 0;
+    /* Custom scrollbar for webkit */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+.shop-configurator::-webkit-scrollbar {
+    width: 6px;
+}
+
+.shop-configurator::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.shop-configurator::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+/* Right Configurator */
+
+
+.shop-configurator h2 {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 1rem;
+}
+
+.config-section {
+    margin-bottom: 2rem;
+}
+
+.config-section h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    color: var(--text-accent);
+}
+
+.material-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+}
+
+.material-btn {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-light);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: left;
+}
+
+.material-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.material-btn.active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--text-accent);
+    box-shadow: 0 0 15px rgba(200, 200, 200, 0.2);
+}
+
+.mat-name {
+    font-weight: 500;
+}
+
+.mat-price {
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+}
+
+.config-actions {
+    margin-top: 2rem;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.shop-textarea {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--text-light);
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.shop-textarea:focus {
+    border-color: var(--text-accent);
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-muted);
+}
+
+/* Success Popup */
+.success-popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.success-popup {
+    max-width: 500px;
+    padding: 3rem;
+    text-align: center;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.popup-greeting {
+    font-size: 1.2rem;
+    color: var(--text-accent);
+    margin: 1rem 0;
+}
+
+.popup-highlight {
+    font-size: 0.95rem;
+    color: var(--text-muted);
+    margin: 1.5rem 0;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+/* Inputs & Forms */
+.shop-input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--text-light);
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.shop-input:focus {
+    border-color: var(--text-accent);
+}
+
+.disclaimer-text {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-bottom: 1rem;
+    font-style: italic;
+    line-height: 1.4;
+}

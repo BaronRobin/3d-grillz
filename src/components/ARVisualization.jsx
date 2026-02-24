@@ -18,7 +18,6 @@ const ARVisualization = () => {
                         <div className="ar-feature glass-dark hover-lift fade-in-left">
                             <div className="ar-gif-bg"></div> {/* Placeholder for UE5 GIF */}
                             <div className="feature-content-wrapper">
-                                <div className="feature-icon">📱</div>
                                 <h3>Real-Time Preview</h3>
                                 <p>
                                     Using Apple's ARKit and Unreal Engine 5, visualize grillz designs
@@ -31,7 +30,6 @@ const ARVisualization = () => {
                         <div className="ar-feature glass-dark hover-lift fade-in-up stagger-2">
                             <div className="ar-gif-bg" style={{ animationDelay: '1s' }}></div> {/* Placeholder for GIF */}
                             <div className="feature-content-wrapper">
-                                <div className="feature-icon">✨</div>
                                 <h3>PBR Materials</h3>
                                 <p>
                                     Physically-based rendering simulates real-world metal reflections,
@@ -43,7 +41,6 @@ const ARVisualization = () => {
                         <div className="ar-feature glass-dark hover-lift fade-in-right stagger-3">
                             <div className="ar-gif-bg" style={{ animationDelay: '2s' }}></div> {/* Placeholder for GIF */}
                             <div className="feature-content-wrapper">
-                                <div className="feature-icon">🎯</div>
                                 <h3>Precise Tracking</h3>
                                 <p>
                                     ARKit's face tracking technology ensures sub-millimeter alignment accuracy,
@@ -75,12 +72,17 @@ const ARVisualization = () => {
                         </div>
                     </div>
 
-                    <div className="ar-cta fade-in-up stagger-5">
-                        <Link to="/ar-experience" className="btn btn-primary">
-                            Launch AR Experience
-                        </Link>
+                    <div className="ar-cta fade-in-up stagger-5" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+                        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            <Link to="/ar-experience" className="btn btn-primary">
+                                Launch AR Experience
+                            </Link>
+                            <Link to="/shop" className="btn btn-secondary">
+                                View WebGL 3D Models
+                            </Link>
+                        </div>
                         <p className="ar-note">
-                            *AR features require iOS 14+ with ARKit-compatible device
+                            *AR features require iOS 14+ with ARKit-compatible device. WebGL available on all devices.
                         </p>
                     </div>
                 </div>

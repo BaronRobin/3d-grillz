@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { FaArrowUp } from 'react-icons/fa';
 
+/**
+ * BackToTop Component that provides a button to scroll back to the top of the page.
+ * Becomes visible after scrolling down a certain amount.
+ * @returns {JSX.Element}
+ */
 const BackToTop = () => {
     const [visible, setVisible] = useState(false);
 

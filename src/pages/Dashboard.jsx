@@ -3,6 +3,11 @@ import { useAuth } from '../context/AuthContext';
 import { Link, Navigate } from 'react-router-dom';
 import WebGLShowcase from '../components/WebGLShowcase';
 
+/**
+ * Customer Dashboard Page displaying order status and details.
+ * Redirects to login if the user is not authenticated.
+ * @returns {JSX.Element}
+ */
 const Dashboard = () => {
     const { user, getUserOrder } = useAuth();
 
