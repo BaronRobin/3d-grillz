@@ -122,6 +122,18 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Helper function to detect OS
+    const getDeviceOS = () => {
+        const userAgent = window.navigator.userAgent || window.navigator.vendor || window.opera;
+        if (/windows phone/i.test(userAgent)) return "Windows Phone";
+        if (/android/i.test(userAgent)) return "Android";
+        if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) return "iOS";
+        if (/Macintosh|Mac OS X/.test(userAgent)) return "Mac OS";
+        if (/Windows NT/.test(userAgent)) return "Windows";
+        if (/Linux/.test(userAgent)) return "Linux";
+        return "Unknown";
+    };
+
     // User Action: Submit Quote Request (Ticket)
     const submitQuoteRequest = async (userEmail, ticketDetails) => {
         const newTicket = {
@@ -129,7 +141,7 @@ export const AuthProvider = ({ children }) => {
             name: ticketDetails.name || 'Unknown',
             material_id: ticketDetails.materialId || 'gold',
             comments: ticketDetails.comments || 'N/A',
-            date: new Date().toLocaleDateString(),
+            device_os: getDeviceOS(),
             status: 'pending'
         };
 
@@ -140,10 +152,8 @@ export const AuthProvider = ({ children }) => {
             setTickets(prev => ({
                 ...prev,
                 [userEmail]: {
-                    email: userEmail,
-                    date: newTicket.date,
-                    status: 'pending',
-                    ...ticketDetails
+                    ...newTicket,
+                    created_at: new Date().toISOString()
                 }
             }));
         } else {
@@ -159,10 +169,11 @@ export const AuthProvider = ({ children }) => {
         const newOrder = {
             email: email,
             name: ticket.name,
-            model_type: ticket.materialId === 'gold' ? 0 : 1,
+            model_type: ticket.material_id === 'gold' ? 0 : 1,
             current_stage: 0,
             history: [{ stage: 'Order Approved & Login Sent', date: new Date().toLocaleDateString() }],
-            comments: ticket.comments
+            comments: ticket.comments,
+            device_os: ticket.device_os
         };
 
         // Fire both queries to sync databases

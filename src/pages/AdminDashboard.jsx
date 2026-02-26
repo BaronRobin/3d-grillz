@@ -69,12 +69,20 @@ const AdminDashboard = () => {
                                     .filter(([_, t]) => t.status === 'pending')
                                     .map(([email, ticket]) => (
                                         <tr key={email} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                            <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>{ticket.date}</td>
+                                            <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>
+                                                <div>{ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : ticket.date}</div>
+                                                <div style={{ fontSize: '0.8rem', color: '#888' }}>
+                                                    {ticket.created_at ? new Date(ticket.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}
+                                                </div>
+                                            </td>
                                             <td style={{ padding: '1rem' }}>
                                                 <div style={{ fontWeight: 'bold' }}>{ticket.name}</div>
                                                 <div style={{ fontSize: '0.8rem', color: '#888' }}>{email}</div>
+                                                <div style={{ fontSize: '0.7rem', color: '#5ac8fa', marginTop: '4px' }}>
+                                                    {ticket.device_os || 'Unknown Device'}
+                                                </div>
                                             </td>
-                                            <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{ticket.materialId}</td>
+                                            <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{ticket.materialId || ticket.material_id}</td>
                                             <td style={{ padding: '1rem', maxWidth: '300px' }}>
                                                 <div style={{ fontSize: '0.9rem', color: '#ccc', maxHeight: '60px', overflowY: 'auto' }}>
                                                     {ticket.comments}
