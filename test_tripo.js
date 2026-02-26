@@ -13,7 +13,7 @@ const testTripo = async () => {
             },
             body: JSON.stringify({
                 "type": "text_to_model",
-                "prompt": "a simple set of golden grillz conforming to human teeth. single bottom tooth cap. photorealistic."
+                "prompt": "a full set of upper and lower golden grillz capturing the full dental arc conforming to human teeth. photorealistic, metallic surface."
             })
         });
 
@@ -35,7 +35,7 @@ const testTripo = async () => {
                 status = pollData.data.status;
                 console.log("Status:", status);
                 if (status === 'success') {
-                    console.log("Result URL:", pollData.data.result.model.url);
+                    console.log("Result URL:", pollData.data.result?.pbr_model?.url || pollData.data.result?.model?.url || 'URL Not Found');
                     break;
                 }
                 if (status === 'failed' || status === 'cancelled') {

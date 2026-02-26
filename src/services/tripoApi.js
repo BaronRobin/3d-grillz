@@ -13,7 +13,7 @@ export const generateGrillzMesh = async (userDescription) => {
     }
 
     // The hidden system prompt that strictly formats the user's idea
-    const systemPrompt = `generate a highly detailed grill mesh, conforming to a human teeth model. Photorealistic style, metallic surface. User design request: ${userDescription}`;
+    const systemPrompt = `generate a highly detailed set of upper and lower grillz, capturing the full dental arc conforming to a human teeth model. Photorealistic style, metallic surface. User design request: ${userDescription}`;
 
     try {
         // 1. Submit the task
@@ -58,7 +58,7 @@ export const generateGrillzMesh = async (userDescription) => {
             status = pollData.data.status;
             
             if (status === 'success') {
-                return pollData.data.result.model.url;
+                return pollData.data.result.pbr_model?.url || pollData.data.result.model?.url;
             }
             
             if (status === 'failed' || status === 'cancelled') {
