@@ -9,9 +9,9 @@ import { Navigate } from 'react-router-dom';
  * @returns {JSX.Element}
  */
 const AdminDashboard = () => {
-    const { user, orders, updateOrderStatus } = useAuth();
+    const { user, orders, updateOrderStatus, tickets, approveTicket, updateTicketStatus } = useAuth();
     const { getLiveFeed, onlineUsers, sendLogsToPi } = useAnalytics();
-    const [activeTab, setActiveTab] = useState('orders'); // 'orders' or 'analytics'
+    const [activeTab, setActiveTab] = useState('tickets'); // 'tickets', 'orders' or 'analytics'
     const [piStatus, setPiStatus] = useState(null);
 
     if (!user || user.role !== 'admin') {
@@ -31,6 +31,12 @@ const AdminDashboard = () => {
             {/* Toggle Tabs */}
             <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
                 <button
+                    onClick={() => setActiveTab('tickets')}
+                    className={`btn ${activeTab === 'tickets' ? 'btn-primary' : 'btn-secondary'}`}
+                >
+                    Quote Requests
+                </button>
+                <button
                     onClick={() => setActiveTab('orders')}
                     className={`btn ${activeTab === 'orders' ? 'btn-primary' : 'btn-secondary'}`}
                 >
@@ -43,6 +49,76 @@ const AdminDashboard = () => {
                     Live Operations
                 </button>
             </div>
+
+            {activeTab === 'tickets' && (
+                <div className="glass" style={{ padding: '2rem' }}>
+                    <h3 style={{ marginBottom: '1.5rem' }}>Incoming Quote Requests</h3>
+                    <div style={{ overflowX: 'auto' }}>
+                        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '800px' }}>
+                            <thead>
+                                <tr style={{ borderBottom: '1px solid #333' }}>
+                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Date</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Client Info</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Material</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Comments</th>
+                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Object.entries(tickets || {})
+                                    .filter(([_, t]) => t.status === 'pending')
+                                    .map(([email, ticket]) => (
+                                        <tr key={email} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                                            <td style={{ padding: '1rem', whiteSpace: 'nowrap' }}>{ticket.date}</td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <div style={{ fontWeight: 'bold' }}>{ticket.name}</div>
+                                                <div style={{ fontSize: '0.8rem', color: '#888' }}>{email}</div>
+                                            </td>
+                                            <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{ticket.materialId}</td>
+                                            <td style={{ padding: '1rem', maxWidth: '300px' }}>
+                                                <div style={{ fontSize: '0.9rem', color: '#ccc', maxHeight: '60px', overflowY: 'auto' }}>
+                                                    {ticket.comments}
+                                                </div>
+                                            </td>
+                                            <td style={{ padding: '1rem' }}>
+                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                    <button
+                                                        className="btn btn-primary"
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                                                        onClick={() => approveTicket(email)}
+                                                    >
+                                                        Approve & Invite
+                                                    </button>
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                                                        onClick={() => updateTicketStatus(email, 'declined')}
+                                                    >
+                                                        Decline
+                                                    </button>
+                                                    <a
+                                                        href={`mailto:${email}?subject=Regarding Your Quote Request - 3D Grillz`}
+                                                        className="btn btn-secondary"
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', textDecoration: 'none' }}
+                                                    >
+                                                        Email
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                {Object.values(tickets || {}).filter(t => t.status === 'pending').length === 0 && (
+                                    <tr>
+                                        <td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>
+                                            No pending quote requests.
+                                        </td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            )}
 
             {activeTab === 'orders' && (
                 <div className="glass" style={{ padding: '2rem' }}>
@@ -60,8 +136,11 @@ const AdminDashboard = () => {
                             <tbody>
                                 {Object.entries(orders).map(([email, order]) => (
                                     <tr key={email} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                        <td style={{ padding: '1rem' }}>{email}</td>
-                                        <td style={{ padding: '1rem' }}>{['Gold', 'Classic', 'Diamond'][order.modelType]}</td>
+                                        <td style={{ padding: '1rem' }}>
+                                            <div style={{ fontWeight: 'bold' }}>{order.name || email.split('@')[0]}</div>
+                                            <div style={{ fontSize: '0.8rem', color: '#888' }}>{email}</div>
+                                        </td>
+                                        <td style={{ padding: '1rem' }}>{['Gold', 'Classic', 'Diamond'][order.modelType] || 'Standard'}</td>
                                         <td style={{ padding: '1rem' }}>
                                             <span style={{
                                                 padding: '0.25rem 0.75rem',

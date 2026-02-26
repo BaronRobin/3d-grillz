@@ -17,6 +17,7 @@
     position: relative;
     border-radius: 20px;
     overflow: hidden;
+    pointer-events: auto; /* Re-enable clicks that were disabled by the shop wrapper */
 }
 
 .interaction-hint {

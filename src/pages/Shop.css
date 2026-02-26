@@ -47,21 +47,25 @@
 .shop-viewer-wrapper {
     position: relative;
     border-radius: 20px;
-    overflow: hidden;
+    overflow: visible; /* Allowing Float to safely spill, but restricting clicks to the canvas */
     flex-grow: 1;
     min-height: 400px;
+    pointer-events: none; /* Stops the wrapper from blocking clicks */
 }
 
 .shop-viewer-wrapper .webgl-container {
     padding: 0;
     height: 100%;
     min-height: unset;
+    pointer-events: auto; /* Re-enables clicks specifically on the 3D model */
 }
 
 /* Right Configurator */
 .shop-configurator {
     padding: 1rem;
     height: auto;
+    position: relative;
+    z-index: 10; /* Ensure this is above any floating 3D elements */
 }
 
 @media (min-width: 992px) {
