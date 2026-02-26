@@ -9,6 +9,7 @@ CREATE TABLE public.tickets (
     material_id TEXT NOT NULL,
     comments TEXT NOT NULL,
     device_os TEXT NOT NULL DEFAULT 'Unknown',
+    ai_mesh_url TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     status TEXT NOT NULL DEFAULT 'pending'
 );
@@ -23,6 +24,7 @@ CREATE TABLE public.orders (
     comments TEXT,
     admin_notes TEXT DEFAULT '',
     device_os TEXT NOT NULL DEFAULT 'Unknown',
+    ai_mesh_url TEXT,
     needs_password_change BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

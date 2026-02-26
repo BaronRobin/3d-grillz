@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { Navigate } from 'react-router-dom';
 import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, FileText } from 'lucide-react';
+import { generateGrillzMesh } from '../services/tripoApi';
 
 /**
  * Admin Panel for managing orders and viewing live analytics.
@@ -10,7 +11,7 @@ import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, File
  * @returns {JSX.Element}
  */
 const AdminDashboard = () => {
-    const { user, tickets, orders, loading, fetchAdminData, logout, approveTicket, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset } = useAuth();
+    const { user, tickets, orders, loading, fetchAdminData, logout, approveTicket, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset, saveAiMeshToTicket } = useAuth();
     const { fetchActivityLogs, onlineUsers } = useAnalytics();
     const [activeTab, setActiveTab] = useState('tickets');
     const [logs, setLogs] = useState([]);
@@ -22,6 +23,21 @@ const AdminDashboard = () => {
     const [userLogs, setUserLogs] = useState([]);
     const [deleteInput, setDeleteInput] = useState('');
     const [editForm, setEditForm] = useState({ name: '', modelType: '', stage: '', adminNotes: '' });
+
+    // AI Generation State
+    const [generatingAiFor, setGeneratingAiFor] = useState(null);
+
+    const handleGenerateAi = async (email, comments) => {
+        try {
+            setGeneratingAiFor(email);
+            const modelUrl = await generateGrillzMesh(comments);
+            await saveAiMeshToTicket(email, modelUrl);
+        } catch (err) {
+            alert("AI Generation Error: " + err.message);
+        } finally {
+            setGeneratingAiFor(null);
+        }
+    };
 
     React.useEffect(() => {
         if (activeTab === 'analytics') {
@@ -125,6 +141,20 @@ const AdminDashboard = () => {
                                                 </div>
                                             </td>
                                             <td style={{ padding: '1rem' }}>
+                                                {ticket.ai_mesh_url ? (
+                                                    <a href={ticket.ai_mesh_url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                                                        <Box size={14} /> View AI Mesh
+                                                    </a>
+                                                ) : (
+                                                    <button
+                                                        className="btn btn-secondary"
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem', color: 'var(--color-accent)', borderColor: 'var(--color-accent)' }}
+                                                        onClick={() => handleGenerateAi(email, ticket.comments)}
+                                                        disabled={generatingAiFor === email}
+                                                    >
+                                                        {generatingAiFor === email ? 'Generating... (~15s)' : 'Generate AI Mesh'}
+                                                    </button>
+                                                )}
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                                     <button
                                                         className="btn btn-primary"

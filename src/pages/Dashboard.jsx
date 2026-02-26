@@ -152,7 +152,10 @@ const Dashboard = () => {
                 {/* TILE 3: MAIN SHOWCASE */}
                 <div style={{ gridArea: 'showcase', position: 'relative' }} className="fade-in-up">
                     <div className="glass" style={{ height: '100%', padding: '0', overflow: 'hidden', position: 'relative' }}>
-                        <WebGLShowcase />
+                        <WebGLShowcase
+                            modelUrl={order.ai_mesh_url || null}
+                            forcedMaterial={order.ai_mesh_url ? { color: '#eec95e', roughness: 0.1 } : null}
+                        />
 
                         {/* Overlay HUD */}
                         <div style={{ position: 'absolute', bottom: '2rem', left: '2rem', right: '2rem', display: 'flex', justifyContent: 'space-between', pointerEvents: 'none' }}>

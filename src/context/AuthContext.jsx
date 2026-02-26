@@ -85,7 +85,8 @@ export const AuthProvider = ({ children }) => {
                     comments: o.comments,
                     admin_notes: o.admin_notes,
                     device_os: o.device_os,
-                    needs_password_change: o.needs_password_change
+                    needs_password_change: o.needs_password_change,
+                    ai_mesh_url: o.ai_mesh_url
                 });
                 setOrders(orderMap);
             }
@@ -113,7 +114,8 @@ export const AuthProvider = ({ children }) => {
                         comments: data.comments,
                         admin_notes: data.admin_notes,
                         device_os: data.device_os,
-                        needs_password_change: data.needs_password_change
+                        needs_password_change: data.needs_password_change,
+                        ai_mesh_url: data.ai_mesh_url
                     }
                 }));
             }
@@ -234,7 +236,8 @@ export const AuthProvider = ({ children }) => {
             current_stage: 0,
             history: [{ stage: 'Quote Approved & Email Sent', date: new Date().toLocaleDateString() }],
             comments: ticket.comments,
-            device_os: ticket.device_os
+            device_os: ticket.device_os,
+            ai_mesh_url: ticket.ai_mesh_url
         };
 
         // Fire both queries to sync databases
@@ -253,7 +256,8 @@ export const AuthProvider = ({ children }) => {
                     history: newOrder.history,
                     modelType: newOrder.model_type,
                     comments: ticket.comments,
-                    needs_password_change: true
+                    needs_password_change: true,
+                    ai_mesh_url: ticket.ai_mesh_url
                 }
             }));
 
@@ -330,6 +334,21 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Admin Action: Save AI Mesh URL to ticket
+    const saveAiMeshToTicket = async (email, url) => {
+        const { error } = await supabase.from('tickets').update({ ai_mesh_url: url }).eq('email', email);
+        if (!error) {
+            setTickets(prev => ({
+                ...prev,
+                [email]: { ...prev[email], ai_mesh_url: url }
+            }));
+            return { success: true };
+        } else {
+            console.error("Failed to save AI mesh:", error);
+            return { success: false, error };
+        }
+    };
+
     // Admin Action: Trigger Password Reset Loop
     const triggerPasswordReset = async (email) => {
         const { error: dbError } = await supabase.from('orders').update({ needs_password_change: true }).eq('email', email);
@@ -370,7 +389,8 @@ export const AuthProvider = ({ children }) => {
             updateOrderDetails,
             forceUpdatePassword,
             triggerPasswordReset,
-            getUserOrder
+            getUserOrder,
+            saveAiMeshToTicket
         }}>
             {children}
         </AuthContext.Provider>

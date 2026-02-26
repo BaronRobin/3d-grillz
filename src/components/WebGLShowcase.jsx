@@ -1,9 +1,30 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Float, Environment, ContactShadows } from '@react-three/drei';
+import { OrbitControls, Float, Environment, ContactShadows, useGLTF } from '@react-three/drei';
 import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import './WebGLShowcase.css';
+
+const CustomModel = ({ url, color, roughness }) => {
+    const { scene } = useGLTF(url);
+
+    // Dynamically apply gold/silver/etc materials over the AI generated mesh
+    React.useEffect(() => {
+        if (scene) {
+            scene.traverse((child) => {
+                if (child.isMesh && child.material) {
+                    child.material = child.material.clone();
+                    child.material.color.set(color);
+                    child.material.metalness = 1.0;
+                    child.material.roughness = roughness;
+                    child.material.needsUpdate = true;
+                }
+            });
+        }
+    }, [scene, color, roughness]);
+
+    return <primitive object={scene} scale={2} />;
+};
 
 /**
  * Custom 3D Model Component for the WebGL Showcase.
@@ -13,16 +34,27 @@ import './WebGLShowcase.css';
  * @param {number} props.geometryType - The index determining which geometry to render.
  * @param {string} props.color - Hex color for the material.
  * @param {number} props.roughness - Material roughness.
+ * @param {string} [props.modelUrl] - Optional external .glb URL from Tripo3D
  * @returns {JSX.Element}
  */
-const GrillModel = ({ visible, geometryType, color = "#eec95e", roughness = 0.1 }) => {
+const GrillModel = ({ visible, geometryType, color = "#eec95e", roughness = 0.1, modelUrl }) => {
     const mesh = useRef();
 
     useFrame((state) => {
         const t = state.clock.getElapsedTime();
-        mesh.current.rotation.y = Math.sin(t / 4) / 2;
-        mesh.current.rotation.z = (1 + Math.sin(t / 1.5)) / 20;
+        if (mesh.current) {
+            mesh.current.rotation.y = Math.sin(t / 4) / 2;
+            mesh.current.rotation.z = (1 + Math.sin(t / 1.5)) / 20;
+        }
     });
+
+    if (modelUrl) {
+        return (
+            <group dispose={null} ref={mesh} visible={visible}>
+                <CustomModel url={modelUrl} color={color} roughness={roughness} />
+            </group>
+        );
+    }
 
     return (
         <group dispose={null}>
@@ -46,11 +78,12 @@ const GrillModel = ({ visible, geometryType, color = "#eec95e", roughness = 0.1 
  * @param {Object} props
  * @param {Object} [props.forcedMaterial] - Optional material override properties {color, roughness}
  * @param {boolean} [props.hideHeader] - If true, hides the "Interactive Showcase" header
+ * @param {string} [props.modelUrl] - External Tripo3D .glb AI mesh
  * @returns {JSX.Element}
  */
-const WebGLShowcase = ({ forcedMaterial, hideHeader = false }) => {
+const WebGLShowcase = ({ forcedMaterial, hideHeader = false, modelUrl }) => {
     const [index, setIndex] = useState(0);
-    const designs = ['Custom Molded Gold', 'Classic Grill', 'Diamond Cut'];
+    const designs = modelUrl ? ['Your AI Design Estimation'] : ['Custom Molded Gold', 'Classic Grill', 'Diamond Cut'];
 
     const nextDesign = () => setIndex((prev) => (prev + 1) % designs.length);
     const prevDesign = () => setIndex((prev) => (prev - 1 + designs.length) % designs.length);
@@ -77,6 +110,7 @@ const WebGLShowcase = ({ forcedMaterial, hideHeader = false }) => {
                                     visible={true}
                                     color={forcedMaterial ? forcedMaterial.color : (index === 2 ? "#b9f2ff" : "#eec95e")}
                                     roughness={forcedMaterial ? forcedMaterial.roughness : 0.1}
+                                    modelUrl={modelUrl}
                                 />
                             </Float>
 
@@ -110,20 +144,31 @@ const WebGLShowcase = ({ forcedMaterial, hideHeader = false }) => {
                         </div>
 
                         <div className="design-controls">
-                            <button className="control-btn" onClick={prevDesign}>
-                                <FaChevronLeft />
-                            </button>
+                            {!modelUrl && (
+                                <button className="control-btn" onClick={prevDesign}>
+                                    <FaChevronLeft />
+                                </button>
+                            )}
                             <div className="design-info">
                                 <h3>{designs[index]}</h3>
-                                <div className="design-indicator">
-                                    {designs.map((_, i) => (
-                                        <div key={i} className={`indicator-dot ${i === index ? 'active' : ''}`} />
-                                    ))}
-                                </div>
+                                {!modelUrl && (
+                                    <div className="design-indicator">
+                                        {designs.map((_, i) => (
+                                            <div key={i} className={`indicator-dot ${i === index ? 'active' : ''}`} />
+                                        ))}
+                                    </div>
+                                )}
+                                {modelUrl && (
+                                    <div style={{ fontSize: '0.7rem', color: '#ffb347', marginTop: '4px', letterSpacing: '0.5px' }}>
+                                        AI-GENERATED APPROXIMATION
+                                    </div>
+                                )}
                             </div>
-                            <button className="control-btn" onClick={nextDesign}>
-                                <FaChevronRight />
-                            </button>
+                            {!modelUrl && (
+                                <button className="control-btn" onClick={nextDesign}>
+                                    <FaChevronRight />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
