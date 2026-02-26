@@ -33,18 +33,38 @@ ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Allow public to submit tickets" 
     ON public.tickets 
     FOR INSERT 
-    TO anon 
+    TO anon, authenticated
     WITH CHECK (true);
 
--- Allow admins to read/update the tables without authenticated login yet (temporarily allowed for the local admin mock to fetch data)
-CREATE POLICY "Allow anon admin access" 
+-- 5. Strict Authenticated Rules (Users see only their tickets/orders, Admins see all)
+-- Tickets:
+CREATE POLICY "Users can view their own tickets or admins can view all" 
     ON public.tickets 
-    FOR ALL 
-    TO anon 
-    USING (true);
+    FOR SELECT 
+    TO authenticated 
+    USING (
+        auth.jwt() ->> 'email' = email 
+        OR auth.jwt() ->> 'email' = 'YOUR_PERSONAL_EMAIL_HERE'
+    );
 
-CREATE POLICY "Allow anon admin access orders" 
+CREATE POLICY "Admins can update tickets" 
+    ON public.tickets 
+    FOR UPDATE 
+    TO authenticated 
+    USING (auth.jwt() ->> 'email' = 'YOUR_PERSONAL_EMAIL_HERE');
+
+-- Orders:
+CREATE POLICY "Users can view their own orders or admins can view all" 
+    ON public.orders 
+    FOR SELECT 
+    TO authenticated 
+    USING (
+        auth.jwt() ->> 'email' = email 
+        OR auth.jwt() ->> 'email' = 'YOUR_PERSONAL_EMAIL_HERE'
+    );
+
+CREATE POLICY "Admins can insert/update orders" 
     ON public.orders 
     FOR ALL 
-    TO anon 
-    USING (true);
+    TO authenticated 
+    USING (auth.jwt() ->> 'email' = 'YOUR_PERSONAL_EMAIL_HERE');

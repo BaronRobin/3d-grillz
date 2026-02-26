@@ -17,20 +17,42 @@ export const AuthProvider = ({ children }) => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Fetch current session on mount
         const initializeSession = async () => {
-            // Check local storage for persisted admin/user session
-            const storedUser = localStorage.getItem('grillz_user');
-            if (storedUser) {
-                const parsedUser = JSON.parse(storedUser);
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.user) {
+                const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@grillz.com';
+                const parsedUser = {
+                    email: session.user.email,
+                    role: session.user.email === adminEmail ? 'admin' : 'user',
+                    uid: session.user.id
+                };
                 setUser(parsedUser);
-                // If they are an admin, immediately fetch the live dashboard data
-                if (parsedUser.role === 'admin') {
-                    await fetchAdminData();
-                }
+                if (parsedUser.role === 'admin') fetchAdminData();
             }
             setLoading(false);
         };
         initializeSession();
+
+        // Listen for realtime auth changes (login/logout across tabs)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            if (session?.user) {
+                const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@grillz.com';
+                const parsedUser = {
+                    email: session.user.email,
+                    role: session.user.email === adminEmail ? 'admin' : 'user',
+                    uid: session.user.id
+                };
+                setUser(parsedUser);
+                if (parsedUser.role === 'admin') fetchAdminData();
+            } else {
+                setUser(null);
+                setTickets({});
+                setOrders({});
+            }
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
     const fetchAdminData = async () => {
@@ -39,10 +61,7 @@ export const AuthProvider = ({ children }) => {
             const { data: ticketData, error: tErr } = await supabase.from('tickets').select('*');
             if (!tErr && ticketData) {
                 const ticketMap = {};
-                ticketData.forEach(t => ticketMap[t.email] = {
-                    ...t,
-                    materialId: t.material_id
-                });
+                ticketData.forEach(t => ticketMap[t.email] = { ...t, materialId: t.material_id });
                 setTickets(ticketMap);
             }
 
@@ -55,7 +74,8 @@ export const AuthProvider = ({ children }) => {
                     modelType: o.model_type,
                     history: o.history,
                     name: o.name,
-                    comments: o.comments
+                    comments: o.comments,
+                    device_os: o.device_os
                 });
                 setOrders(orderMap);
             }
@@ -65,41 +85,20 @@ export const AuthProvider = ({ children }) => {
     };
 
     const login = async (email, password) => {
-        // Simple mock authentication simulating a backend token check
-        return new Promise((resolve, reject) => {
-            setTimeout(() => {
-                if (email && password) {
-                    // Determine role based on email
-                    let role = 'user';
-                    if (email.includes('admin')) {
-                        role = 'admin';
-                    } else if (email.includes('vip')) {
-                        role = 'vip';
-                    }
+        const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@grillz.com';
+        const loginEmail = email.trim().toLowerCase() === 'admin' ? adminEmail : email;
 
-                    const newUser = {
-                        email,
-                        role,
-                        displayName: email.split('@')[0],
-                        uid: 'mock-uid-' + Date.now()
-                    };
-                    setUser(newUser);
-                    localStorage.setItem('grillz_user', JSON.stringify(newUser));
+        const { data, error } = await supabase.auth.signInWithPassword({ email: loginEmail, password });
+        if (error) throw error.message;
 
-                    // If login is successful, trigger safe data fetch if admin
-                    if (role === 'admin') fetchAdminData();
-
-                    resolve(newUser);
-                } else {
-                    reject("Invalid credentials");
-                }
-            }, 800);
-        });
+        return {
+            email: data.user.email,
+            role: data.user.email === adminEmail ? 'admin' : 'user'
+        };
     };
 
-    const logout = () => {
-        setUser(null);
-        localStorage.removeItem('grillz_user');
+    const logout = async () => {
+        await supabase.auth.signOut();
     };
 
     // Admin Action: Update Order Status
