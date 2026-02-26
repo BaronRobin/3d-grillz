@@ -187,7 +187,7 @@ const Dashboard = () => {
                         </div>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0' }}>
                             <span style={{ color: '#888', fontSize: '0.85rem' }}>Order Date</span>
-                            <span style={{ fontWeight: '600' }}>{order.history[0]?.date || 'Today'}</span>
+                            <span style={{ fontWeight: '600' }}>{order.history?.[0]?.date || 'Today'}</span>
                         </div>
                     </div>
                 </BentoTile>
