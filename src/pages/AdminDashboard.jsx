@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { Navigate } from 'react-router-dom';
-import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, FileText } from 'lucide-react';
+import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, FileText, Box } from 'lucide-react';
 import { generateGrillzMesh } from '../services/tripoApi';
 
 /**
