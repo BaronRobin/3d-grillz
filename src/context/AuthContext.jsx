@@ -170,7 +170,7 @@ export const AuthProvider = ({ children }) => {
             name: ticket.name,
             model_type: ticket.material_id === 'gold' ? 0 : 1,
             current_stage: 0,
-            history: [{ stage: 'Order Approved & Login Sent', date: new Date().toLocaleDateString() }],
+            history: [{ stage: 'Quote Approved & Email Sent', date: new Date().toLocaleDateString() }],
             comments: ticket.comments,
             device_os: ticket.device_os
         };
@@ -201,6 +201,56 @@ export const AuthProvider = ({ children }) => {
             }));
         } else {
             console.error("Failed to convert ticket to order:", orderResp.error, ticketResp.error);
+        }
+    };
+
+    // Admin Action: Delete Order and Revert Ticket
+    const deleteOrder = async (email) => {
+        // Drop the order
+        const { error: orderError } = await supabase.from('orders').delete().eq('email', email);
+        // Revert ticket to pending so it can be re-evaluated
+        const { error: ticketError } = await supabase.from('tickets').update({ status: 'pending' }).eq('email', email);
+
+        if (!orderError && !ticketError) {
+            setOrders(prev => {
+                const next = { ...prev };
+                delete next[email];
+                return next;
+            });
+            setTickets(prev => ({
+                ...prev,
+                [email]: { ...prev[email], status: 'pending' }
+            }));
+            return { success: true };
+        } else {
+            console.error("Failed to delete order:", orderError, ticketError);
+            return { success: false, error: orderError || ticketError };
+        }
+    };
+
+    // Admin Action: Deep Update Order Details
+    const updateOrderDetails = async (email, updates) => {
+        const payload = {};
+        if (updates.name !== undefined) payload.name = updates.name;
+        if (updates.modelType !== undefined) payload.model_type = updates.modelType;
+        if (updates.stage !== undefined) payload.current_stage = updates.stage;
+        if (updates.adminNotes !== undefined) payload.admin_notes = updates.adminNotes;
+        if (updates.comments !== undefined) payload.comments = updates.comments;
+
+        const { error } = await supabase.from('orders').update(payload).eq('email', email);
+
+        if (!error) {
+            setOrders(prev => ({
+                ...prev,
+                [email]: {
+                    ...prev[email],
+                    ...updates
+                }
+            }));
+            return { success: true };
+        } else {
+            console.error("Failed to deep update order:", error);
+            return { success: false, error };
         }
     };
 
@@ -235,7 +285,9 @@ export const AuthProvider = ({ children }) => {
             submitQuoteRequest,
             approveTicket,
             updateTicketStatus,
-            getUserOrder
+            getUserOrder,
+            deleteOrder,
+            updateOrderDetails
         }}>
             {children}
         </AuthContext.Provider>

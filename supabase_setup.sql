@@ -21,6 +21,7 @@ CREATE TABLE public.orders (
     current_stage INTEGER NOT NULL DEFAULT 0,
     history JSONB NOT NULL DEFAULT '[]'::jsonb,
     comments TEXT,
+    admin_notes TEXT DEFAULT '',
     device_os TEXT NOT NULL DEFAULT 'Unknown',
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

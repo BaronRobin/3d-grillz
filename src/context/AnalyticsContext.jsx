@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
+import { supabase } from '../supabaseClient';
 
 const AnalyticsContext = createContext(null);
 
@@ -13,44 +14,82 @@ const AnalyticsContext = createContext(null);
  */
 export const AnalyticsProvider = ({ children, user }) => {
     const location = useLocation();
-    const [clickLog, setClickLog] = useState([]);
-    const [pageLog, setPageLog] = useState([]);
-    const [onlineUsers, setOnlineUsers] = useState([]); // Mock "Online" list
-
-    // Track Page Views
-    useEffect(() => {
-        if (user) {
-            const entry = {
-                type: 'NAVIGATION',
-                detail: `Visited ${location.pathname}`,
-                timestamp: new Date().toISOString(),
-                user: user.email
-            };
-            setPageLog(prev => [entry, ...prev].slice(0, 50)); // Keep last 50
-            updateOnlineUser(user, entry);
+    const [onlineUsers, setOnlineUsers] = useState([]);
+    const [visitorId] = useState(() => {
+        let vid = sessionStorage.getItem('grillz_visitor_id');
+        if (!vid) {
+            vid = 'v_' + Math.random().toString(36).substr(2, 9);
+            sessionStorage.setItem('grillz_visitor_id', vid);
         }
-    }, [location, user]);
+        return vid;
+    });
 
-    // Track Clicks (Mock "Global" click listener)
+    // Track Page Views, Dwell Time, and Scroll Depth
+    useEffect(() => {
+        const startTime = Date.now();
+        let maxScroll = 0;
+
+        const handleScroll = () => {
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollHeight = document.documentElement.scrollHeight;
+            const clientHeight = document.documentElement.clientHeight;
+
+            // Percentage scrolled (if no scrollbar, it's 100%)
+            const winHeightPx = scrollHeight - clientHeight;
+            const scrolled = winHeightPx > 0 ? Math.round((scrollTop / winHeightPx) * 100) : 100;
+
+            if (scrolled > maxScroll) maxScroll = Math.min(scrolled, 100);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        // When the user leaves the page or unmounts, log the elapsed event
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+            const durationSec = Math.floor((Date.now() - startTime) / 1000);
+
+            supabase.from('activity_logs').insert([{
+                visitor_id: visitorId,
+                user_email: user?.email || null,
+                action_type: 'NAVIGATION',
+                detail: `Visited ${location.pathname}`,
+                session_duration_sec: durationSec,
+                max_scroll_depth: maxScroll
+            }]).then(({ error }) => {
+                if (error) console.error("Telemetry error:", error);
+            });
+
+            // Still update online UI locally if signed in
+            if (user) updateOnlineUser(user, { detail: `Visited ${location.pathname}`, timestamp: new Date().toISOString() });
+        };
+    }, [location, user, visitorId]);
+
+    // Track Global Clicks
     useEffect(() => {
         const handleClick = (e) => {
-            if (user && (e.target.tagName === 'BUTTON' || e.target.tagName === 'A')) {
-                const entry = {
-                    type: 'INTERACTION',
-                    detail: `Clicked ${e.target.innerText || e.target.tagName}`,
-                    timestamp: new Date().toISOString(),
-                    user: user.email
-                };
-                setClickLog(prev => [entry, ...prev].slice(0, 50));
-                updateOnlineUser(user, entry);
+            if (e.target.tagName === 'BUTTON' || e.target.tagName === 'A' || e.target.closest('button')) {
+                const targetText = e.target.innerText || e.target.closest('button')?.innerText || e.target.tagName;
+
+                supabase.from('activity_logs').insert([{
+                    visitor_id: visitorId,
+                    user_email: user?.email || null,
+                    action_type: 'INTERACTION',
+                    detail: `Clicked ${targetText}`,
+                    session_duration_sec: null,
+                    max_scroll_depth: null
+                }]).then(({ error }) => {
+                    if (error) console.error("Telemetry error:", error);
+                });
+
+                if (user) updateOnlineUser(user, { detail: `Clicked ${targetText}`, timestamp: new Date().toISOString() });
             }
         };
 
         window.addEventListener('click', handleClick);
         return () => window.removeEventListener('click', handleClick);
-    }, [user]);
+    }, [user, visitorId]);
 
-    // Mock "Online Presence" (Update timestamp for user)
+    // Mock "Online Presence"
     const updateOnlineUser = (user, latestActivity) => {
         setOnlineUsers(prev => {
             const others = prev.filter(u => u.email !== user.email);
@@ -58,37 +97,27 @@ export const AnalyticsProvider = ({ children, user }) => {
         });
     };
 
-    // Send logs to Raspberry Pi backend
-    const sendLogsToPi = async () => {
-        const PI_SERVER_URL = 'http://192.168.1.61:3001'; // Your Pi's IP
-        const combined = getLiveFeed();
+    // Fetch Historical Logs for Admin Dashboard
+    const fetchActivityLogs = async (daysBack = 7) => {
+        const dateLimit = new Date();
+        dateLimit.setDate(dateLimit.getDate() - daysBack);
 
-        if (combined.length === 0) return { success: false, message: 'No logs to send' };
+        const { data, error } = await supabase
+            .from('activity_logs')
+            .select('*')
+            .gte('timestamp', dateLimit.toISOString())
+            .order('timestamp', { ascending: false })
+            .limit(200);
 
-        try {
-            const response = await fetch(`${PI_SERVER_URL}/api/analytics`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ logs: combined })
-            });
-
-            const data = await response.json();
-            console.log('Success! Logs sent to Pi:', data);
-            return data;
-        } catch (error) {
-            console.error('Failed to send logs to Pi:', error);
-            return { success: false, error: error.message };
+        if (error) {
+            console.error("Failed to fetch logs:", error);
+            return [];
         }
-    };
-
-    // Combined logs for Admin
-    const getLiveFeed = () => {
-        const combined = [...pageLog, ...clickLog].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-        return combined;
+        return data;
     };
 
     return (
-        <AnalyticsContext.Provider value={{ getLiveFeed, onlineUsers, sendLogsToPi }}>
+        <AnalyticsContext.Provider value={{ fetchActivityLogs, onlineUsers }}>
             {children}
         </AnalyticsContext.Provider>
     );

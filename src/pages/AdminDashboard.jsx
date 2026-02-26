@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { Navigate } from 'react-router-dom';
+import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, FileText } from 'lucide-react';
 
 /**
  * Admin Panel for managing orders and viewing live analytics.
@@ -9,17 +10,52 @@ import { Navigate } from 'react-router-dom';
  * @returns {JSX.Element}
  */
 const AdminDashboard = () => {
-    const { user, orders, updateOrderStatus, tickets, approveTicket, updateTicketStatus } = useAuth();
-    const { getLiveFeed, onlineUsers, sendLogsToPi } = useAnalytics();
-    const [activeTab, setActiveTab] = useState('tickets'); // 'tickets', 'orders' or 'analytics'
-    const [piStatus, setPiStatus] = useState(null);
+    const { user, orders, updateOrderStatus, tickets, approveTicket, updateTicketStatus, deleteOrder, updateOrderDetails } = useAuth();
+    const { fetchActivityLogs, onlineUsers } = useAnalytics();
+    const [activeTab, setActiveTab] = useState('tickets');
+    const [logs, setLogs] = useState([]);
+    const [daysBack, setDaysBack] = useState(7);
+    const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+
+    // Deep Edit State
+    const [editingUser, setEditingUser] = useState(null);
+    const [userLogs, setUserLogs] = useState([]);
+    const [deleteInput, setDeleteInput] = useState('');
+    const [editForm, setEditForm] = useState({ name: '', modelType: '', stage: '', adminNotes: '' });
+
+    React.useEffect(() => {
+        if (activeTab === 'analytics') {
+            setIsLoadingLogs(true);
+            fetchActivityLogs(daysBack).then(data => {
+                setLogs(data);
+                setIsLoadingLogs(false);
+            });
+        }
+    }, [activeTab, daysBack]);
+
+    // Calculate Top 3 Visiting Days based on unique visitor IDs
+    const getTopDays = () => {
+        const dayCounts = {};
+        logs.forEach(log => {
+            const dateStr = new Date(log.timestamp).toLocaleDateString();
+            if (!dayCounts[dateStr]) dayCounts[dateStr] = new Set();
+            dayCounts[dateStr].add(log.visitor_id);
+        });
+
+        const sorted = Object.entries(dayCounts)
+            .map(([date, visitors]) => ({ date, uniqueCount: visitors.size }))
+            .sort((a, b) => b.uniqueCount - a.uniqueCount)
+            .slice(0, 3);
+
+        return sorted;
+    };
 
     if (!user || user.role !== 'admin') {
         return <Navigate to="/login" />;
     }
 
-    const stages = ['Scan Received', '3D Design', 'Casting', 'Polishing', 'Delivery'];
-    const logs = getLiveFeed();
+    const stages = ['Quote Approved & Email Sent', 'Scan Received', '3D Design', 'Revision Loop', 'Casting', 'Polishing', 'Delivery'];
+    const topDays = getTopDays();
 
     return (
         <div style={{ paddingTop: '100px', minHeight: '100vh', paddingBottom: '4rem' }} className="container">
@@ -160,7 +196,7 @@ const AdminDashboard = () => {
                                                 {stages[order.stage]}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '1rem' }}>
+                                        <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                                             <select
                                                 value={order.stage}
                                                 onChange={(e) => updateOrderStatus(email, parseInt(e.target.value))}
@@ -177,6 +213,25 @@ const AdminDashboard = () => {
                                                     <option key={idx} value={idx}>{stage}</option>
                                                 ))}
                                             </select>
+                                            <button
+                                                className="btn btn-secondary"
+                                                style={{ padding: '0.5rem 1rem' }}
+                                                onClick={async () => {
+                                                    setEditingUser(email);
+                                                    setDeleteInput('');
+                                                    setEditForm({
+                                                        name: order.name,
+                                                        modelType: order.modelType,
+                                                        stage: order.stage,
+                                                        adminNotes: order.admin_notes || ''
+                                                    });
+                                                    // Immediately fetch their personal telemetry history
+                                                    const hist = await fetchActivityLogs(30);
+                                                    setUserLogs(hist.filter(l => l.user_email === email || l.visitor_id === email));
+                                                }}
+                                            >
+                                                Edit
+                                            </button>
                                         </td>
                                     </tr>
                                 ))}
@@ -187,67 +242,230 @@ const AdminDashboard = () => {
             )}
 
             {activeTab === 'analytics' && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
-                    {/* Online Users */}
-                    <div className="glass" style={{ padding: '2rem' }}>
-                        <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                            <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4cd964', display: 'inline-block' }}></span>
-                            Online Users
-                        </h3>
-                        {onlineUsers.length === 0 ? (
-                            <p style={{ color: '#666' }}>No active users detected.</p>
+                <>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+                        {/* Online Users */}
+                        <div className="glass" style={{ padding: '2rem' }}>
+                            <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#4cd964', display: 'inline-block', boxShadow: '0 0 10px #4cd964' }}></span>
+                                Active Sign-Ins
+                            </h3>
+                            {onlineUsers.length === 0 ? (
+                                <p style={{ color: '#666' }}>No active user sessions.</p>
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {onlineUsers.map((u, i) => (
+                                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px' }}>
+                                            <div style={{ width: '35px', height: '35px', borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                                {u.email[0].toUpperCase()}
+                                            </div>
+                                            <div>
+                                                <div style={{ fontWeight: 'bold' }}>{u.email}</div>
+                                                <div style={{ fontSize: '0.8rem', color: '#888' }}>Last: {u.lastAction}</div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Top 3 Visiting Days */}
+                        <div className="glass" style={{ padding: '2rem' }}>
+                            <h3 style={{ marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                📅 Top 3 High-Volume Days
+                            </h3>
+                            {topDays.length === 0 ? (
+                                <p style={{ color: '#666' }}>Not enough data collected yet.</p>
+                            ) : (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    {topDays.map((td, i) => (
+                                        <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', background: 'rgba(0,0,0,0.2)', borderRadius: '8px' }}>
+                                            <div style={{ fontWeight: 'bold' }}>{i + 1}. {td.date}</div>
+                                            <div style={{ color: '#5ac8fa', fontWeight: 'bold' }}>{td.uniqueCount} Unique Visitors</div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Live Activity Feed */}
+                    <div className="glass" style={{ padding: '2rem', marginTop: '2rem', maxHeight: '600px', overflowY: 'auto' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '1.5rem' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                                <h3>Cloud Telemetry Feed</h3>
+
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ fontSize: '0.9rem', color: '#888' }}>Date Range:</span>
+                                    <select
+                                        value={daysBack}
+                                        onChange={(e) => setDaysBack(Number(e.target.value))}
+                                        style={{ padding: '0.5rem', borderRadius: '5px', background: '#222', color: 'white', border: '1px solid #444' }}
+                                    >
+                                        <option value={1}>Last 24 Hours</option>
+                                        <option value={7}>Last 7 Days</option>
+                                        <option value={30}>Last 30 Days</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        {isLoadingLogs ? (
+                            <p style={{ color: '#888', textAlign: 'center' }}>Syncing with Supabase...</p>
                         ) : (
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                                {onlineUsers.map((u, i) => (
-                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.75rem', background: 'rgba(255,255,255,0.03)', borderRadius: '10px' }}>
-                                        <div style={{ width: '35px', height: '35px', borderRadius: '50%', background: '#333', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                            {u.email[0].toUpperCase()}
+                                {logs.map((log) => {
+                                    const isNav = log.action_type === 'NAVIGATION';
+                                    const color = isNav ? '#5ac8fa' : '#ffcc00';
+
+                                    return (
+                                        <div key={log.id} style={{
+                                            padding: '1rem',
+                                            borderLeft: `3px solid ${color}`,
+                                            background: 'rgba(0,0,0,0.2)',
+                                            borderRadius: '0 8px 8px 0',
+                                            display: 'flex',
+                                            flexDirection: 'column',
+                                            gap: '0.5rem'
+                                        }}>
+                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.9rem', color: '#ccc', fontWeight: 'bold', fontFamily: 'monospace' }}>
+                                                    <UserIcon size={14} color="#888" /> {log.visitor_id} {log.user_email ? `(${log.user_email})` : ''}
+                                                </div>
+                                                <span style={{ fontSize: '0.8rem', color: '#666' }}>
+                                                    {new Date(log.timestamp).toLocaleString()}
+                                                </span>
+                                            </div>
+
+                                            <div style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                {isNav ? <Compass size={16} color="#5ac8fa" /> : <MousePointerClick size={16} color="#ffcc00" />} {log.detail}
+                                            </div>
+
+                                            {/* Telemetry Visualizers */}
+                                            {(log.session_duration_sec !== null || log.max_scroll_depth !== null) && (
+                                                <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.5rem', fontSize: '0.85rem', color: '#888', background: 'rgba(255,255,255,0.02)', padding: '0.5rem', borderRadius: '6px' }}>
+                                                    {log.session_duration_sec !== null && (
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                                            <Clock size={14} /> <span>{Math.floor(log.session_duration_sec / 60)}m {log.session_duration_sec % 60}s</span>
+                                                        </div>
+                                                    )}
+                                                    {log.max_scroll_depth !== null && (
+                                                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, maxWidth: '200px' }}>
+                                                            <FileText size={14} /> <span style={{ width: '40px' }}>{log.max_scroll_depth}%</span>
+                                                            <div style={{ height: '6px', background: '#333', borderRadius: '3px', flex: 1, overflow: 'hidden' }}>
+                                                                <div style={{ width: `${log.max_scroll_depth}%`, height: '100%', background: '#ff3b30' }}></div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                         </div>
-                                        <div>
-                                            <div style={{ fontWeight: 'bold' }}>{u.displayName}</div>
-                                            <div style={{ fontSize: '0.8rem', color: '#888' }}>Last: {u.lastAction}</div>
-                                        </div>
-                                    </div>
-                                ))}
+                                    );
+                                })}
+                                {logs.length === 0 && <p style={{ color: '#5ac8fa', textAlign: 'center', padding: '1rem' }}>No activity matching this criteria.</p>}
                             </div>
                         )}
                     </div>
+                </>
+            )}
+            {/* DEEP EDIT MODAL OVERLAY */}
+            {editingUser && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+                    background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
+                }}>
+                    <div className="glass" style={{ width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-                    {/* Live Feed */}
-                    <div className="glass" style={{ padding: '2rem', maxHeight: '500px', overflowY: 'auto' }}>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                            <h3>Activity Feed</h3>
-                            <button
-                                className="btn btn-primary"
-                                style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
-                                onClick={async () => {
-                                    setPiStatus('Sending...');
-                                    const result = await sendLogsToPi();
-                                    setPiStatus(result.success ? 'Success! Sent to Pi.' : 'Failed to send.');
-                                    setTimeout(() => setPiStatus(null), 3000);
-                                }}
-                            >
-                                Send to Pi
-                            </button>
+                        {/* Header */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <h2 style={{ margin: 0 }}>Advanced Order Management</h2>
+                            <button onClick={() => setEditingUser(null)} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
                         </div>
-                        {piStatus && <div style={{ marginBottom: '1rem', padding: '0.5rem', background: 'rgba(201, 169, 97, 0.1)', borderRadius: '5px', textAlign: 'center', fontSize: '0.9rem' }}>{piStatus}</div>}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            {logs.map((log, i) => (
-                                <div key={i} style={{
-                                    padding: '0.75rem',
-                                    borderLeft: `3px solid ${log.type === 'NAVIGATION' ? '#5ac8fa' : '#ffcc00'}`,
-                                    background: 'rgba(0,0,0,0.2)'
-                                }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
-                                        <span style={{ fontSize: '0.8rem', color: '#aaa' }}>{log.user}</span>
-                                        <span style={{ fontSize: '0.7rem', color: '#555' }}>
-                                            {new Date(log.timestamp).toLocaleTimeString()}
-                                        </span>
-                                    </div>
-                                    <div style={{ fontSize: '0.9rem' }}>{log.detail}</div>
+
+                        {/* Two Column Layout */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+
+                            {/* LEFT COLUMN: Data Mutation */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <h3>Data Modifiers</h3>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <label>Account ID</label>
+                                    <input type="text" value={editingUser} disabled style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#111', color: '#888' }} />
                                 </div>
-                            ))}
-                            {logs.length === 0 && <p style={{ color: '#444' }}>Waiting for events...</p>}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <label>Client Name</label>
+                                    <input type="text" value={editForm.name} onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#fff' }} />
+                                </div>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <label>Pipeline Stage</label>
+                                        <select value={editForm.stage} onChange={(e) => setEditForm(prev => ({ ...prev, stage: parseInt(e.target.value) }))} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#fff' }}>
+                                            {stages.map((stage, idx) => (
+                                                <option key={idx} value={idx}>{stage}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        <label>Material Model</label>
+                                        <select value={editForm.modelType} onChange={(e) => setEditForm(prev => ({ ...prev, modelType: parseInt(e.target.value) }))} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#fff' }}>
+                                            <option value={0}>Gold</option>
+                                            <option value={1}>Classic</option>
+                                            <option value={2}>Diamond</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                    <label>Internal Admin Notes (Hidden from Client)</label>
+                                    <textarea value={editForm.adminNotes} onChange={(e) => setEditForm(prev => ({ ...prev, adminNotes: e.target.value }))} rows={4} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#ffcc00', resize: 'vertical' }} placeholder="Log private vendor history here..." />
+                                </div>
+
+                                {/* Save Actions */}
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                        {deleteInput === 'Delete' ? (
+                                            <button className="btn btn-primary" style={{ background: '#ff3b30' }} onClick={async () => {
+                                                await deleteOrder(editingUser);
+                                                setEditingUser(null);
+                                            }}>Purge Order Record</button>
+                                        ) : (
+                                            <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red' }} />
+                                        )}
+                                    </div>
+
+                                    <button className="btn btn-primary" onClick={async () => {
+                                        await updateOrderDetails(editingUser, editForm);
+                                        setEditingUser(null);
+                                    }}>Save Changes</button>
+                                </div>
+                            </div>
+
+                            {/* RIGHT COLUMN: Target Analytics */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <h3>Target Analytics Feed</h3>
+                                <div style={{ background: '#111', borderRadius: '8px', border: '1px solid #333', padding: '1rem', height: '100%', minHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    {userLogs.length === 0 ? (
+                                        <p style={{ color: '#666', textAlign: 'center', marginTop: '2rem' }}>No telemetry data captured for this address in the last 30 days.</p>
+                                    ) : (
+                                        userLogs.map(log => {
+                                            const isNav = log.action_type === 'NAVIGATION';
+                                            return (
+                                                <div key={log.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', paddingBottom: '1rem', borderBottom: '1px solid #222' }}>
+                                                    <span style={{ fontSize: '0.75rem', color: '#666' }}>{new Date(log.timestamp).toLocaleString()}</span>
+                                                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: isNav ? '#5ac8fa' : '#ffcc00' }}>
+                                                        {isNav ? <Compass size={14} /> : <MousePointerClick size={14} />}
+                                                        <span style={{ fontSize: '0.9rem', color: '#fff' }}>{log.detail}</span>
+                                                    </div>
+                                                    {log.session_duration_sec !== null && (
+                                                        <span style={{ fontSize: '0.8rem', color: '#888' }}><Clock size={12} style={{ display: 'inline', verticalAlign: 'middle', marginRight: '4px' }} /> Dwell time: {Math.floor(log.session_duration_sec / 60)}m {log.session_duration_sec % 60}s</span>
+                                                    )}
+                                                </div>
+                                            )
+                                        })
+                                    )}
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
