@@ -16,8 +16,10 @@ export const generateGrillzMesh = async (userDescription) => {
     const systemPrompt = `generate a highly detailed set of upper and lower grillz, capturing the full dental arc conforming to a human teeth model. Photorealistic style, metallic surface. User design request: ${userDescription}`;
 
     try {
+        const CORS_PROXY = 'https://corsproxy.io/?';
+        
         // 1. Submit the task
-        const response = await fetch('https://api.tripo3d.ai/v2/openapi/task', {
+        const response = await fetch(CORS_PROXY + encodeURIComponent('https://api.tripo3d.ai/v2/openapi/task'), {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${API_KEY}`,
@@ -43,7 +45,7 @@ export const generateGrillzMesh = async (userDescription) => {
             // Wait 2.5 seconds between polls
             await new Promise(resolve => setTimeout(resolve, 2500));
             
-            const pollResp = await fetch(`https://api.tripo3d.ai/v2/openapi/task/${taskId}`, {
+            const pollResp = await fetch(CORS_PROXY + encodeURIComponent(`https://api.tripo3d.ai/v2/openapi/task/${taskId}`), {
                 headers: {
                     'Authorization': `Bearer ${API_KEY}`
                 }
