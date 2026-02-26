@@ -369,7 +369,8 @@ export const AuthProvider = ({ children }) => {
             deleteOrder,
             updateOrderDetails,
             forceUpdatePassword,
-            triggerPasswordReset
+            triggerPasswordReset,
+            getUserOrder
         }}>
             {children}
         </AuthContext.Provider>
