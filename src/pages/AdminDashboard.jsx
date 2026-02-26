@@ -128,14 +128,14 @@ const AdminDashboard = () => {
                                                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                                                     <button
                                                         className="btn btn-primary"
-                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}
                                                         onClick={() => approveTicket(email)}
                                                     >
-                                                        Approve & Invite
+                                                        Approve
                                                     </button>
                                                     <button
                                                         className="btn btn-secondary"
-                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}
                                                         onClick={() => updateTicketStatus(email, 'declined')}
                                                     >
                                                         Decline
@@ -143,7 +143,7 @@ const AdminDashboard = () => {
                                                     <a
                                                         href={`mailto:${email}?subject=Regarding Your Quote Request - 3D Grillz`}
                                                         className="btn btn-secondary"
-                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.85rem', textDecoration: 'none' }}
+                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', textDecoration: 'none' }}
                                                     >
                                                         Email
                                                     </a>
@@ -215,7 +215,7 @@ const AdminDashboard = () => {
                                             </select>
                                             <button
                                                 className="btn btn-secondary"
-                                                style={{ padding: '0.5rem 1rem' }}
+                                                style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}
                                                 onClick={async () => {
                                                     setEditingUser(email);
                                                     setDeleteInput('');
@@ -375,7 +375,7 @@ const AdminDashboard = () => {
                     background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
                 }}>
-                    <div className="glass" style={{ width: '100%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', padding: '2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    <div className="glass" style={{ width: '100%', maxWidth: '1200px', maxHeight: '95vh', overflowY: 'auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
                         {/* Header */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -424,16 +424,16 @@ const AdminDashboard = () => {
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         {deleteInput === 'Delete' ? (
-                                            <button className="btn btn-primary" style={{ background: '#ff3b30' }} onClick={async () => {
+                                            <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold', background: '#ff3b30' }} onClick={async () => {
                                                 await deleteOrder(editingUser);
                                                 setEditingUser(null);
                                             }}>Purge Order Record</button>
                                         ) : (
-                                            <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red' }} />
+                                            <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red', fontSize: '0.85rem' }} />
                                         )}
                                     </div>
 
-                                    <button className="btn btn-primary" onClick={async () => {
+                                    <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }} onClick={async () => {
                                         await updateOrderDetails(editingUser, editForm);
                                         setEditingUser(null);
                                     }}>Save Changes</button>
@@ -443,7 +443,7 @@ const AdminDashboard = () => {
                             {/* RIGHT COLUMN: Target Analytics */}
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 <h3>Target Analytics Feed</h3>
-                                <div style={{ background: '#111', borderRadius: '8px', border: '1px solid #333', padding: '1rem', height: '100%', minHeight: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ background: '#111', borderRadius: '8px', border: '1px solid #333', padding: '1.5rem', height: '100%', minHeight: '400px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     {userLogs.length === 0 ? (
                                         <p style={{ color: '#666', textAlign: 'center', marginTop: '2rem' }}>No telemetry data captured for this address in the last 30 days.</p>
                                     ) : (
