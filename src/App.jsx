@@ -9,6 +9,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import Shop from './pages/Shop'; // Import the new Shop component
+import ForceReset from './pages/ForceReset';
+import { PrivateRoute } from './components/PrivateRoute';
 import CustomCursor from './components/CustomCursor';
 import BackToTop from './components/BackToTop';
 import { AuthProvider } from './context/AuthContext';
@@ -41,7 +43,7 @@ const AppContent = () => {
   const location = useLocation();
 
   // Pages where footer should be hidden
-  const hideFooterRoutes = ['/login', '/dashboard', '/admin', '/ar-experience', '/shop'];
+  const hideFooterRoutes = ['/login', '/dashboard', '/admin', '/ar-experience', '/shop', '/force-reset'];
   const shouldHideFooter = hideFooterRoutes.includes(location.pathname);
 
   return (
@@ -55,8 +57,9 @@ const AppContent = () => {
           <Route path="/about" element={<About />} />
           <Route path="/ar-experience" element={<ArExperience />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+          <Route path="/admin" element={<PrivateRoute requireAdmin={true}><AdminDashboard /></PrivateRoute>} />
+          <Route path="/force-reset" element={<ForceReset />} />
           <Route path="/shop" element={<Shop />} /> {/* Add Shop route */}
         </Routes>
         {!shouldHideFooter && <Footer />}

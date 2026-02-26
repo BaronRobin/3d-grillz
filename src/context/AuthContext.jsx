@@ -28,14 +28,18 @@ export const AuthProvider = ({ children }) => {
                     uid: session.user.id
                 };
                 setUser(parsedUser);
-                if (parsedUser.role === 'admin') fetchAdminData();
+                if (parsedUser.role === 'admin') {
+                    fetchAdminData();
+                } else {
+                    fetchUserData(parsedUser.email);
+                }
             }
             setLoading(false);
         };
         initializeSession();
 
         // Listen for realtime auth changes (login/logout across tabs)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
             if (session?.user) {
                 const adminEmail = import.meta.env.VITE_ADMIN_EMAIL || 'admin@grillz.com';
                 const parsedUser = {
@@ -44,8 +48,12 @@ export const AuthProvider = ({ children }) => {
                     uid: session.user.id
                 };
                 setUser(parsedUser);
-                if (parsedUser.role === 'admin') fetchAdminData();
-            } else {
+                if (parsedUser.role === 'admin') {
+                    fetchAdminData();
+                } else {
+                    fetchUserData(parsedUser.email);
+                }
+            } else if (event === 'SIGNED_OUT') {
                 setUser(null);
                 setTickets({});
                 setOrders({});
@@ -75,12 +83,42 @@ export const AuthProvider = ({ children }) => {
                     history: o.history,
                     name: o.name,
                     comments: o.comments,
-                    device_os: o.device_os
+                    admin_notes: o.admin_notes,
+                    device_os: o.device_os,
+                    needs_password_change: o.needs_password_change
                 });
                 setOrders(orderMap);
             }
         } catch (e) {
             console.error("Error fetching admin data:", e);
+        }
+    };
+
+    const fetchUserData = async (email) => {
+        try {
+            const { data, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('email', email)
+                .single();
+
+            if (!error && data) {
+                setOrders(prev => ({
+                    ...prev,
+                    [email]: {
+                        stage: data.current_stage,
+                        modelType: data.model_type,
+                        history: data.history,
+                        name: data.name,
+                        comments: data.comments,
+                        admin_notes: data.admin_notes,
+                        device_os: data.device_os,
+                        needs_password_change: data.needs_password_change
+                    }
+                }));
+            }
+        } catch (e) {
+            console.error("Error fetching user data:", e);
         }
     };
 
@@ -95,6 +133,30 @@ export const AuthProvider = ({ children }) => {
             email: data.user.email,
             role: data.user.email === adminEmail ? 'admin' : 'user'
         };
+    };
+
+    const sendMagicLink = async (email) => {
+        const { error } = await supabase.auth.signInWithOtp({ email, options: { shouldCreateUser: false } });
+        if (error) throw error.message;
+        return { success: true };
+    };
+
+    const forceUpdatePassword = async (newPassword) => {
+        if (!user) return { success: false, error: 'Not authenticated' };
+
+        const { error: authError } = await supabase.auth.updateUser({ password: newPassword });
+        if (authError) return { success: false, error: authError.message };
+
+        // Unlock the trap door
+        const { error: dbError } = await supabase.from('orders').update({ needs_password_change: false }).eq('email', user.email);
+        if (dbError) return { success: false, error: dbError.message };
+
+        setOrders(prev => ({
+            ...prev,
+            [user.email]: { ...prev[user.email], needs_password_change: false }
+        }));
+
+        return { success: true };
     };
 
     const logout = async () => {
@@ -190,7 +252,8 @@ export const AuthProvider = ({ children }) => {
                     stage: 0,
                     history: newOrder.history,
                     modelType: newOrder.model_type,
-                    comments: ticket.comments
+                    comments: ticket.comments,
+                    needs_password_change: true
                 }
             }));
 
@@ -262,7 +325,24 @@ export const AuthProvider = ({ children }) => {
                 ...prev,
                 [email]: { ...prev[email], status }
             }));
+        } else {
+            console.error("Failed to update ticket form:", error);
         }
+    };
+
+    // Admin Action: Trigger Password Reset Loop
+    const triggerPasswordReset = async (email) => {
+        const { error: dbError } = await supabase.from('orders').update({ needs_password_change: true }).eq('email', email);
+        if (dbError) return { success: false, error: dbError.message };
+
+        const { error: authError } = await supabase.auth.signInWithOtp({ email });
+        if (authError) return { success: false, error: authError.message };
+
+        setOrders(prev => ({
+            ...prev,
+            [email]: { ...prev[email], needs_password_change: true }
+        }));
+        return { success: true };
     };
 
     const getUserOrder = (email) => {
@@ -276,18 +356,20 @@ export const AuthProvider = ({ children }) => {
     return (
         <AuthContext.Provider value={{
             user,
-            loading,
-            login,
-            logout,
             orders,
             tickets,
+            loading,
+            login,
+            sendMagicLink,
+            logout,
             updateOrderStatus,
             submitQuoteRequest,
             approveTicket,
             updateTicketStatus,
-            getUserOrder,
             deleteOrder,
-            updateOrderDetails
+            updateOrderDetails,
+            forceUpdatePassword,
+            triggerPasswordReset
         }}>
             {children}
         </AuthContext.Provider>

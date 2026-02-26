@@ -73,6 +73,10 @@ body {
 /* Premium Button Styles */
 .btn {
   position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   padding: 1rem 2.5rem;
   font-size: var(--font-size-sm);
   font-weight: 600;
@@ -86,10 +90,21 @@ body {
   text-transform: uppercase;
   font-family: var(--font-primary);
   z-index: 1;
+  text-decoration: none;
   /* Ensure stacking context */
   -webkit-mask-image: -webkit-radial-gradient(white, black);
   /* Safari border-radius fix */
   mask-image: radial-gradient(white, black);
+}
+
+.btn-icon {
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Remove default link underline for buttons */
@@ -143,6 +158,10 @@ a.btn::after {
   box-shadow: 0 15px 40px rgba(201, 169, 97, 0.5);
 }
 
+a.btn-primary:hover {
+  color: var(--color-primary); /* Prevent generic a:hover #fff override */
+}
+
 .btn-primary:active {
   transform: translateY(0);
 }
@@ -159,6 +178,10 @@ a.btn::after {
   border-color: var(--color-accent);
   transform: translateY(-2px);
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+a.btn-secondary:hover {
+  color: var(--color-text); /* Prevent generic a:hover #fff override */
 }
 
 /* Container */
@@ -248,7 +271,7 @@ a:hover::after {
   background: var(--color-accent);
 }
 
-/* Responsive Typography */
+/* Responsive Typography & Utilities */
 @media (max-width: 768px) {
   :root {
     --font-size-xxl: 2.5rem;
@@ -259,4 +282,105 @@ a:hover::after {
   .section {
     padding: var(--spacing-lg) 0;
   }
+
+  .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: var(--font-size-xs);
+  }
+
+  .hide-on-mobile {
+    display: none !important;
+  }
+
+  .admin-modal {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Tabs Container - Wraps on mobile instead of scrolling */
+.tabs-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.tabs-container .btn {
+  flex: 1;
+  min-width: 140px;
+  text-align: center;
+}
+
+/* Dashboard Bento Grid Layout */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: auto auto auto auto;
+    grid-template-areas:
+        "header header header"
+        "timeline showcase showcase"
+        "details showcase showcase"
+        "actions showcase showcase";
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-areas:
+            "header header"
+            "showcase showcase"
+            "timeline details"
+            "timeline actions";
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+            "header"
+            "showcase"
+            "timeline"
+            "details"
+            "actions";
+    }
+}
+
+/* Animations & Micro-interactions */
+.pulse {
+    box-shadow: 0 0 0 rgba(201, 169, 97, 0.4);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(201, 169, 97, 0.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(201, 169, 97, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(201, 169, 97, 0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease forwards;
+    opacity: 0;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }

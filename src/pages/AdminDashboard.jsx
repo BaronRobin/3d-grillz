@@ -10,7 +10,7 @@ import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, File
  * @returns {JSX.Element}
  */
 const AdminDashboard = () => {
-    const { user, orders, updateOrderStatus, tickets, approveTicket, updateTicketStatus, deleteOrder, updateOrderDetails } = useAuth();
+    const { user, tickets, orders, loading, fetchAdminData, logout, approveTicket, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset } = useAuth();
     const { fetchActivityLogs, onlineUsers } = useAnalytics();
     const [activeTab, setActiveTab] = useState('tickets');
     const [logs, setLogs] = useState([]);
@@ -65,7 +65,7 @@ const AdminDashboard = () => {
             </div>
 
             {/* Toggle Tabs */}
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+            <div className="tabs-container">
                 <button
                     onClick={() => setActiveTab('tickets')}
                     className={`btn ${activeTab === 'tickets' ? 'btn-primary' : 'btn-secondary'}`}
@@ -95,8 +95,8 @@ const AdminDashboard = () => {
                                 <tr style={{ borderBottom: '1px solid #333' }}>
                                     <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Date</th>
                                     <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Client Info</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Material</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Comments</th>
+                                    <th className="hide-on-mobile" style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Material</th>
+                                    <th className="hide-on-mobile" style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Comments</th>
                                     <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Actions</th>
                                 </tr>
                             </thead>
@@ -118,14 +118,14 @@ const AdminDashboard = () => {
                                                     {ticket.device_os || 'Unknown Device'}
                                                 </div>
                                             </td>
-                                            <td style={{ padding: '1rem', textTransform: 'capitalize' }}>{ticket.materialId || ticket.material_id}</td>
-                                            <td style={{ padding: '1rem', maxWidth: '300px' }}>
+                                            <td className="hide-on-mobile" style={{ padding: '1rem', textTransform: 'capitalize' }}>{ticket.materialId || ticket.material_id}</td>
+                                            <td className="hide-on-mobile" style={{ padding: '1rem', maxWidth: '300px' }}>
                                                 <div style={{ fontSize: '0.9rem', color: '#ccc', maxHeight: '60px', overflowY: 'auto' }}>
                                                     {ticket.comments}
                                                 </div>
                                             </td>
                                             <td style={{ padding: '1rem' }}>
-                                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                                     <button
                                                         className="btn btn-primary"
                                                         style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }}
@@ -172,8 +172,8 @@ const AdminDashboard = () => {
                             <thead>
                                 <tr style={{ borderBottom: '1px solid #333' }}>
                                     <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>User</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Model Model</th>
-                                    <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Current Stage</th>
+                                    <th className="hide-on-mobile" style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Model Type</th>
+                                    <th className="hide-on-mobile" style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Current Stage</th>
                                     <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Actions</th>
                                 </tr>
                             </thead>
@@ -184,8 +184,8 @@ const AdminDashboard = () => {
                                             <div style={{ fontWeight: 'bold' }}>{order.name || email.split('@')[0]}</div>
                                             <div style={{ fontSize: '0.8rem', color: '#888' }}>{email}</div>
                                         </td>
-                                        <td style={{ padding: '1rem' }}>{['Gold', 'Classic', 'Diamond'][order.modelType] || 'Standard'}</td>
-                                        <td style={{ padding: '1rem' }}>
+                                        <td className="hide-on-mobile" style={{ padding: '1rem' }}>{['Gold', 'Classic', 'Diamond'][order.modelType] || 'Standard'}</td>
+                                        <td className="hide-on-mobile" style={{ padding: '1rem' }}>
                                             <span style={{
                                                 padding: '0.25rem 0.75rem',
                                                 borderRadius: '20px',
@@ -196,7 +196,7 @@ const AdminDashboard = () => {
                                                 {stages[order.stage]}
                                             </span>
                                         </td>
-                                        <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        <td style={{ padding: '1rem', display: 'flex', gap: '0.5rem', alignItems: 'center', flexWrap: 'wrap' }}>
                                             <select
                                                 value={order.stage}
                                                 onChange={(e) => updateOrderStatus(email, parseInt(e.target.value))}
@@ -375,7 +375,7 @@ const AdminDashboard = () => {
                     background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000,
                     display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
                 }}>
-                    <div className="glass" style={{ width: '100%', maxWidth: '1200px', maxHeight: '95vh', overflowY: 'auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    <div className="glass admin-modal" style={{ width: '100%', maxWidth: '1200px', maxHeight: '95vh', overflowY: 'auto', padding: '3rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
                         {/* Header */}
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -433,10 +433,19 @@ const AdminDashboard = () => {
                                         )}
                                     </div>
 
-                                    <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }} onClick={async () => {
-                                        await updateOrderDetails(editingUser, editForm);
-                                        setEditingUser(null);
-                                    }}>Save Changes</button>
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }} onClick={async () => {
+                                            await updateOrderDetails(editingUser, editForm);
+                                            setEditingUser(null);
+                                        }}>Save Changes</button>
+
+                                        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }} onClick={async () => {
+                                            if (window.confirm("Send a forced password reset link to this user? They will be locked out until they set a new password.")) {
+                                                await triggerPasswordReset(editingUser);
+                                                alert("Magic Link dispatched.");
+                                            }
+                                        }}>Send Reset Link</button>
+                                    </div>
                                 </div>
                             </div>
 

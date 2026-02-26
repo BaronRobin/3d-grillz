@@ -12,6 +12,7 @@ const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const { login } = useAuth();
     const navigate = useNavigate();
@@ -36,15 +37,15 @@ const Login = () => {
 
     return (
         <div style={{
-            minHeight: '100vh',
+            minHeight: '100dvh',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            paddingTop: '80px', // Nav offset
+            padding: '1.5rem',
             background: 'radial-gradient(circle at 50% 50%, #2d2d2d 0%, #1a1a1a 100%)'
         }}>
-            <div className="glass" style={{
-                padding: '3rem',
+            <div className="glass login-card" style={{
+                padding: '2rem',
                 width: '100%',
                 maxWidth: '400px',
                 display: 'flex',
@@ -65,9 +66,18 @@ const Login = () => {
                     textAlign: 'center'
                 }}>{error}</div>}
 
+                {successMsg && <div style={{
+                    background: 'rgba(52, 199, 89, 0.1)',
+                    color: '#34c759',
+                    padding: '0.75rem',
+                    borderRadius: '8px',
+                    fontSize: '0.9rem',
+                    textAlign: 'center'
+                }}>{successMsg}</div>}
+
                 <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                     <div>
-                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#ccc' }}>Email or Username</label>
+                        <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.85rem', color: '#ccc' }}>Email Address</label>
                         <input
                             type="text"
                             value={email}
@@ -83,7 +93,7 @@ const Login = () => {
                                 outline: 'none',
                                 fontSize: '1rem'
                             }}
-                            placeholder="user or user@example.com"
+                            placeholder="name@example.com"
                         />
                     </div>
                     <div>
@@ -111,7 +121,7 @@ const Login = () => {
                         type="submit"
                         className="btn btn-primary"
                         disabled={isLoggingIn}
-                        style={{ marginTop: '1rem', width: '100%' }}
+                        style={{ marginTop: '0.5rem', width: '100%' }}
                     >
                         {isLoggingIn ? 'Signing In...' : 'Sign In'}
                     </button>

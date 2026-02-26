@@ -1,6 +1,6 @@
--- 0. Drop existing tables to refresh schema
-DROP TABLE IF EXISTS public.orders CASCADE;
-DROP TABLE IF EXISTS public.tickets CASCADE;
+-- 0. Drop existing tables (COMMENTED OUT TO PROTECT LIVE DATA)
+-- DROP TABLE IF EXISTS public.orders CASCADE;
+-- DROP TABLE IF EXISTS public.tickets CASCADE;
 
 -- 1. Create the Tickets Table
 CREATE TABLE public.tickets (
@@ -23,6 +23,7 @@ CREATE TABLE public.orders (
     comments TEXT,
     admin_notes TEXT DEFAULT '',
     device_os TEXT NOT NULL DEFAULT 'Unknown',
+    needs_password_change BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -52,7 +53,7 @@ CREATE POLICY "Admins can update tickets"
     ON public.tickets 
     FOR UPDATE 
     TO authenticated 
-    USING (auth.jwt() ->> 'email' = 'YOUR_PERSONAL_EMAIL_HERE');
+    USING (auth.jwt() ->> 'email' = 'robinbaron@icloud.com');
 
 -- Orders:
 CREATE POLICY "Users can view their own orders or admins can view all" 
