@@ -337,18 +337,42 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Admin Action: Save AI Mesh URL to ticket
-    const saveAiMeshToTicket = async (email, url) => {
-        const { error } = await supabase.from('tickets').update({ ai_mesh_url: url }).eq('email', email);
-        if (!error) {
+    // Admin Action: Download and permanently host AI Mesh URL to ticket
+    const saveAiMeshToTicket = async (email, temporaryUrl) => {
+        try {
+            // 1. Download the short-lived model directly into browser memory
+            const CORS_PROXY = 'https://corsproxy.io/?';
+            const fetchRes = await fetch(CORS_PROXY + encodeURIComponent(temporaryUrl));
+            if (!fetchRes.ok) throw new Error("Failed to download mesh from AI provider.");
+            const blob = await fetchRes.blob();
+
+            // 2. Upload it permanently to our own Supabase Storage bucket
+            const fileName = `ai_mesh_${email.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.glb`;
+            const { error: uploadError } = await supabase.storage
+                .from('designs')
+                .upload(fileName, blob, { contentType: 'model/gltf-binary' });
+
+            if (uploadError) throw uploadError;
+
+            // 3. Obtain the permanent public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('designs')
+                .getPublicUrl(fileName);
+
+            // 4. Update the DB ticket with the permanent URL
+            const { error: dbError } = await supabase.from('tickets').update({ ai_mesh_url: publicUrl }).eq('email', email);
+            if (dbError) throw dbError;
+
+            // 5. Update local React state
             setTickets(prev => ({
                 ...prev,
-                [email]: { ...prev[email], ai_mesh_url: url }
+                [email]: { ...prev[email], ai_mesh_url: publicUrl }
             }));
+
             return { success: true };
-        } else {
-            console.error("Failed to save AI mesh:", error);
-            return { success: false, error };
+        } catch (error) {
+            console.error("Failed to host AI mesh:", error);
+            return { success: false, error: error.message };
         }
     };
 
