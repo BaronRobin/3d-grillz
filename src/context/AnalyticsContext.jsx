@@ -97,6 +97,21 @@ export const AnalyticsProvider = ({ children, user }) => {
         });
     };
 
+    // Generic function to log arbitrary internal server/admin actions
+    const logActivity = async (action_type, detail) => {
+        const { error } = await supabase.from('activity_logs').insert([{
+            visitor_id: visitorId,
+            user_email: user?.email || null,
+            action_type: action_type,
+            detail: detail,
+            session_duration_sec: null,
+            max_scroll_depth: null
+        }]);
+        if (error) console.error("Telemetry error:", error);
+
+        if (user) updateOnlineUser(user, { detail: detail, timestamp: new Date().toISOString() });
+    };
+
     // Fetch Historical Logs for Admin Dashboard
     const fetchActivityLogs = async (daysBack = 7) => {
         const dateLimit = new Date();
@@ -117,7 +132,7 @@ export const AnalyticsProvider = ({ children, user }) => {
     };
 
     return (
-        <AnalyticsContext.Provider value={{ fetchActivityLogs, onlineUsers }}>
+        <AnalyticsContext.Provider value={{ fetchActivityLogs, onlineUsers, logActivity }}>
             {children}
         </AnalyticsContext.Provider>
     );

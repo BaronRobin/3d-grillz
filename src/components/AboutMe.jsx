@@ -1,11 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './AboutMe.css';
+import { changelogData } from '../data/changelogData';
 
 /**
  * AboutMe Component displaying the creator's information and skills.
  * @returns {JSX.Element}
  */
 const AboutMe = () => {
+    const [visibleVersions, setVisibleVersions] = useState(3);
+
+    const loadMoreChangelog = () => {
+        setVisibleVersions(prev => prev + 3);
+    };
+
     return (
         <section className="about-section section" id="about">
             <div className="container">
@@ -47,10 +54,32 @@ const AboutMe = () => {
                             </div>
                         </div>
 
-                        <div className="about-cta">
+                        <div className="about-cta" style={{ marginBottom: '3rem' }}>
                             <button className="btn btn-primary" onClick={() => window.location.href = 'mailto:contact@stuffmadebyrob.com'}>
                                 Get in Touch
                             </button>
+                        </div>
+
+                        {/* Changelog Section */}
+                        <div className="changelog-container">
+                            <h3 className="gradient-text" style={{ marginBottom: '1.5rem', display: 'inline-block' }}>Project Changelog</h3>
+                            <div className="changelog-timeline">
+                                {changelogData.slice(0, visibleVersions).map((log, index) => (
+                                    <div key={index} className="changelog-item">
+                                        <div className="changelog-version-badge">{log.version}</div>
+                                        <ul className="changelog-details">
+                                            {log.changes.map((change, idx) => (
+                                                <li key={idx}>{change}</li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                ))}
+                            </div>
+                            {visibleVersions < changelogData.length && (
+                                <button className="btn btn-secondary load-more-btn" onClick={loadMoreChangelog}>
+                                    Load Older Versions
+                                </button>
+                            )}
                         </div>
                     </div>
 

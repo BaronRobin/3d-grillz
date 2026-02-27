@@ -35,9 +35,14 @@ const AdminDashboard = () => {
     const handleGenerateAi = async (email, comments) => {
         try {
             setGeneratingAiFor(email);
+            if (logActivity) logActivity('AI_GENERATION', `Started AI mesh generation for ${email}`);
+
             const modelUrl = await generateGrillzMesh(comments);
             await saveAiMeshToTicket(email, modelUrl);
+
+            if (logActivity) logActivity('AI_GENERATION', `Successfully completed AI mesh generation for ${email}`);
         } catch (err) {
+            if (logActivity) logActivity('AI_GENERATION', `Failed AI mesh generation for ${email}: ${err.message}`);
             alert("AI Generation Error: " + err.message);
         } finally {
             setGeneratingAiFor(null);
@@ -146,20 +151,6 @@ const AdminDashboard = () => {
                                                 </div>
                                             </td>
                                             <td style={{ padding: '1rem' }}>
-                                                {ticket.ai_mesh_url ? (
-                                                    <a href={ticket.ai_mesh_url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
-                                                        <Box size={14} /> View AI Mesh
-                                                    </a>
-                                                ) : (
-                                                    <button
-                                                        className="btn btn-secondary"
-                                                        style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.5rem', color: 'var(--color-accent)', borderColor: 'var(--color-accent)' }}
-                                                        onClick={() => handleGenerateAi(email, ticket.comments)}
-                                                        disabled={generatingAiFor === email}
-                                                    >
-                                                        {generatingAiFor === email ? 'Generating... (~15s)' : 'Generate AI Mesh'}
-                                                    </button>
-                                                )}
                                                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                                                     <button
                                                         className="btn btn-primary"
@@ -351,7 +342,8 @@ const AdminDashboard = () => {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                 {logs.map((log) => {
                                     const isNav = log.action_type === 'NAVIGATION';
-                                    const color = isNav ? '#5ac8fa' : '#ffcc00';
+                                    const isAi = log.action_type === 'AI_GENERATION';
+                                    const color = isAi ? '#c9a961' : (isNav ? '#5ac8fa' : '#ffcc00');
 
                                     return (
                                         <div key={log.id} style={{
@@ -373,7 +365,8 @@ const AdminDashboard = () => {
                                             </div>
 
                                             <div style={{ fontSize: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                                {isNav ? <Compass size={16} color="#5ac8fa" /> : <MousePointerClick size={16} color="#ffcc00" />} {log.detail}
+                                                {isAi ? <Box size={16} color={color} /> : (isNav ? <Compass size={16} color={color} /> : <MousePointerClick size={16} color={color} />)}
+                                                {log.detail}
                                             </div>
 
                                             {/* Telemetry Visualizers */}
@@ -455,32 +448,53 @@ const AdminDashboard = () => {
                                     <textarea value={editForm.adminNotes} onChange={(e) => setEditForm(prev => ({ ...prev, adminNotes: e.target.value }))} rows={4} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#ffcc00', resize: 'vertical' }} placeholder="Log private vendor history here..." />
                                 </div>
 
-                                {/* Custom Design Upload */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem', padding: '1rem', background: 'rgba(201,169,97,0.05)', borderRadius: '8px', border: '1px solid rgba(201,169,97,0.2)' }}>
-                                    <h4 style={{ margin: 0, color: 'var(--color-accent)' }}>Upload Custom 3D Design</h4>
-                                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.5rem', alignItems: 'center' }}>
-                                        <input type="text" placeholder="Variant (e.g. Snake, V2)" value={uploadVariantName} onChange={(e) => setUploadVariantName(e.target.value)} style={{ padding: '0.5rem', background: '#111', border: '1px solid #333', color: '#fff', borderRadius: '4px', width: '100%' }} />
-                                        <input type="file" accept=".glb,.gltf" onChange={(e) => setUploadFile(e.target.files[0])} style={{ color: '#888', fontSize: '0.75rem', maxWidth: '100%', overflow: 'hidden' }} />
+                                {/* Automated AI Mesh Generation */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem', padding: '1rem', background: 'rgba(201,169,97,0.05)', borderRadius: '8px', border: '1px solid rgba(201,169,97,0.2)' }}>
+                                    <div>
+                                        <h4 style={{ margin: 0, color: 'var(--color-accent)', marginBottom: '0.5rem' }}>Automated AI Mesh Generation</h4>
+                                        <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', margin: 0 }}>Generates a base 3D concept from client's original quote notes</p>
+                                        {(orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url) ? (
+                                            <a href={orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', width: '100%', justifyContent: 'center' }}>
+                                                <Box size={14} /> View Existing AI Mesh
+                                            </a>
+                                        ) : (
+                                            <button
+                                                className="btn btn-secondary"
+                                                style={{ padding: '0.5rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', width: '100%', color: 'var(--color-accent)', borderColor: 'var(--color-accent)' }}
+                                                onClick={() => handleGenerateAi(editingUser, tickets[editingUser]?.comments || editForm.adminNotes || "gold customized grillz")}
+                                                disabled={generatingAiFor === editingUser}
+                                            >
+                                                {generatingAiFor === editingUser ? 'Generating... (~15s)' : 'Generate Initial AI Concept'}
+                                            </button>
+                                        )}
                                     </div>
-                                    <button
-                                        className="btn btn-secondary"
-                                        style={{ padding: '0.5rem', marginTop: '0.5rem', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
-                                        disabled={isUploading || !uploadFile || !uploadVariantName}
-                                        onClick={async () => {
-                                            setIsUploading(true);
-                                            const res = await uploadCustomDesign(editingUser, uploadFile, uploadVariantName);
-                                            setIsUploading(false);
-                                            if (res.success) {
-                                                setUploadFile(null);
-                                                setUploadVariantName('');
-                                                alert("Design attached to client dashboard successfully!");
-                                            } else {
-                                                alert("Upload failed: " + res.error);
-                                            }
-                                        }}
-                                    >
-                                        {isUploading ? 'Pushing to Supabase...' : 'Push Design to Client'}
-                                    </button>
+                                    <div style={{ width: '100%', height: '1px', background: 'rgba(201,169,97,0.1)' }}></div>
+                                    <div>
+                                        <h4 style={{ margin: 0, color: 'var(--color-accent)', marginBottom: '0.5rem' }}>Upload Custom 3D Design</h4>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.5rem', alignItems: 'center' }}>
+                                            <input type="text" placeholder="Variant (e.g. Snake, V2)" value={uploadVariantName} onChange={(e) => setUploadVariantName(e.target.value)} style={{ padding: '0.5rem', background: '#111', border: '1px solid #333', color: '#fff', borderRadius: '4px', width: '100%' }} />
+                                            <input type="file" accept=".glb,.gltf" onChange={(e) => setUploadFile(e.target.files[0])} style={{ color: '#888', fontSize: '0.75rem', maxWidth: '100%', overflow: 'hidden' }} />
+                                        </div>
+                                        <button
+                                            className="btn btn-secondary"
+                                            style={{ padding: '0.5rem', marginTop: '0.5rem', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
+                                            disabled={isUploading || !uploadFile || !uploadVariantName}
+                                            onClick={async () => {
+                                                setIsUploading(true);
+                                                const res = await uploadCustomDesign(editingUser, uploadFile, uploadVariantName);
+                                                setIsUploading(false);
+                                                if (res.success) {
+                                                    setUploadFile(null);
+                                                    setUploadVariantName('');
+                                                    alert("Design attached to client dashboard successfully!");
+                                                } else {
+                                                    alert("Upload failed: " + res.error);
+                                                }
+                                            }}
+                                        >
+                                            {isUploading ? 'Pushing to Supabase...' : 'Push Design to Client'}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Save Actions */}
