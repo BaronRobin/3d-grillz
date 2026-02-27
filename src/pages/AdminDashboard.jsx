@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useAnalytics } from '../context/AnalyticsContext';
 import { Navigate } from 'react-router-dom';
-import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, FileText, Box } from 'lucide-react';
+import { CalendarDays, User as UserIcon, Compass, MousePointerClick, Clock, FileText, Box, Eye } from 'lucide-react';
 import { generateGrillzMesh } from '../services/tripoApi';
+import WebGLShowcase from '../components/WebGLShowcase';
+import UserWebGLShowcase from '../components/UserWebGLShowcase';
 
 /**
  * Admin Panel for managing orders and viewing live analytics.
@@ -28,6 +30,9 @@ const AdminDashboard = () => {
     const [uploadFile, setUploadFile] = useState(null);
     const [uploadVariantName, setUploadVariantName] = useState('');
     const [isUploading, setIsUploading] = useState(false);
+
+    // Admin 3D Preview State
+    const [previewUser, setPreviewUser] = useState(null);
 
     // AI Generation State
     const [generatingAiFor, setGeneratingAiFor] = useState(null);
@@ -453,31 +458,45 @@ const AdminDashboard = () => {
                                     <div>
                                         <h4 style={{ margin: 0, color: 'var(--color-accent)', marginBottom: '0.5rem' }}>Automated AI Mesh Generation</h4>
                                         <p style={{ fontSize: '0.8rem', color: '#888', marginBottom: '0.5rem', margin: 0 }}>Generates a base 3D concept from client's original quote notes</p>
-                                        {(orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url) ? (
-                                            <a href={orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', width: '100%', justifyContent: 'center' }}>
-                                                <Box size={14} /> View Existing AI Mesh
-                                            </a>
-                                        ) : (
-                                            <button
-                                                className="btn btn-secondary"
-                                                style={{ padding: '0.5rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', width: '100%', color: 'var(--color-accent)', borderColor: 'var(--color-accent)' }}
-                                                onClick={() => handleGenerateAi(editingUser, tickets[editingUser]?.comments || editForm.adminNotes || "gold customized grillz")}
-                                                disabled={generatingAiFor === editingUser}
-                                            >
-                                                {generatingAiFor === editingUser ? 'Generating... (~15s)' : 'Generate Initial AI Concept'}
-                                            </button>
-                                        )}
+                                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                            {(orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url) ? (
+                                                <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
+                                                    <a href={orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%' }}>
+                                                        <Box size={14} /> Download File
+                                                    </a>
+                                                    <button className="btn btn-secondary" style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }} onClick={() => setPreviewUser(editingUser)}>
+                                                        <Eye size={14} /> Preview 3D
+                                                    </button>
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    className="btn btn-secondary"
+                                                    style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%' }}
+                                                    onClick={() => handleGenerateAi(editingUser, tickets[editingUser]?.comments || editForm.adminNotes || "gold customized grillz")}
+                                                    disabled={generatingAiFor === editingUser}
+                                                >
+                                                    {generatingAiFor === editingUser ? 'Generating... (~15s)' : 'Generate AI Concept'}
+                                                </button>
+                                            )}
+                                        </div>
                                     </div>
                                     <div style={{ width: '100%', height: '1px', background: 'rgba(201,169,97,0.1)' }}></div>
-                                    <div>
-                                        <h4 style={{ margin: 0, color: 'var(--color-accent)', marginBottom: '0.5rem' }}>Upload Custom 3D Design</h4>
+                                    <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid rgba(201,169,97,0.1)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                            <h4 style={{ margin: 0, color: 'var(--color-accent)' }}>Upload Custom 3D Design</h4>
+                                            {orders[editingUser]?.custom_designs?.length > 0 && (
+                                                <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }} onClick={() => setPreviewUser(editingUser)}>
+                                                    <Eye size={12} /> Preview Client WebGL
+                                                </button>
+                                            )}
+                                        </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.5rem', alignItems: 'center' }}>
                                             <input type="text" placeholder="Variant (e.g. Snake, V2)" value={uploadVariantName} onChange={(e) => setUploadVariantName(e.target.value)} style={{ padding: '0.5rem', background: '#111', border: '1px solid #333', color: '#fff', borderRadius: '4px', width: '100%' }} />
                                             <input type="file" accept=".glb,.gltf" onChange={(e) => setUploadFile(e.target.files[0])} style={{ color: '#888', fontSize: '0.75rem', maxWidth: '100%', overflow: 'hidden' }} />
                                         </div>
                                         <button
                                             className="btn btn-secondary"
-                                            style={{ padding: '0.5rem', marginTop: '0.5rem', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
+                                            style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%', marginTop: '0.5rem' }}
                                             disabled={isUploading || !uploadFile || !uploadVariantName}
                                             onClick={async () => {
                                                 setIsUploading(true);
@@ -498,20 +517,26 @@ const AdminDashboard = () => {
                                 </div>
 
                                 {/* Save Actions */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         {deleteInput === 'Delete' ? (
-                                            <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold', background: '#ff3b30' }} onClick={async () => {
+                                            <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', background: '#ff3b30' }} onClick={async () => {
                                                 await deleteOrder(editingUser);
                                                 setEditingUser(null);
                                             }}>Purge Order Record</button>
                                         ) : (
-                                            <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red', fontSize: '0.85rem' }} />
+                                            <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red', fontSize: '0.85rem', width: '200px' }} />
                                         )}
                                     </div>
 
-                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
-                                        <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }} onClick={async () => {
+                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                                        <button className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }} onClick={async () => {
+                                            if (window.confirm("Send a forced password reset link to this user? They will be locked out until they set a new password.")) {
+                                                await triggerPasswordReset(editingUser);
+                                            }
+                                        }}>Send Reset Link</button>
+
+                                        <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }} onClick={async () => {
                                             await updateOrderDetails(editingUser, editForm);
                                             setEditingUser(null);
                                         }}>Save Changes</button>
@@ -552,6 +577,31 @@ const AdminDashboard = () => {
                                 </div>
                             </div>
 
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Admin 3D Preview Overlay */}
+            {previewUser && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.9)', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <div className="glass admin-modal" style={{ width: '95%', maxWidth: '1000px', height: '90vh', display: 'flex', flexDirection: 'column', position: 'relative', overflow: 'hidden' }}>
+                        <div style={{ padding: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.5)', zIndex: 10 }}>
+                            <h3 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Eye size={18} color="var(--color-accent)" /> Client Dashboard Preview</h3>
+                            <button onClick={() => setPreviewUser(null)} style={{ background: 'transparent', border: 'none', color: '#fff', fontSize: '1.5rem', cursor: 'pointer' }}>&times;</button>
+                        </div>
+                        <div style={{ flex: 1, position: 'relative', background: '#000' }}>
+                            {orders[previewUser]?.custom_designs && orders[previewUser]?.custom_designs.length > 0 ? (
+                                <UserWebGLShowcase
+                                    designs={orders[previewUser].custom_designs}
+                                    requestedMaterialName={['Gold', 'Classic', 'Diamond'][orders[previewUser].modelType || 0] || 'Gold'}
+                                />
+                            ) : (
+                                <WebGLShowcase
+                                    modelUrl={orders[previewUser]?.ai_mesh_url || tickets[previewUser]?.ai_mesh_url || null}
+                                    forcedMaterial={(orders[previewUser]?.ai_mesh_url || tickets[previewUser]?.ai_mesh_url) ? { color: '#eec95e', roughness: 0.1 } : null}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>
