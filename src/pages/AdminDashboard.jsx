@@ -11,7 +11,7 @@ import { generateGrillzMesh } from '../services/tripoApi';
  * @returns {JSX.Element}
  */
 const AdminDashboard = () => {
-    const { user, tickets, orders, loading, fetchAdminData, logout, approveTicket, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset, saveAiMeshToTicket } = useAuth();
+    const { user, tickets, orders, loading, fetchAdminData, logout, approveTicket, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset, saveAiMeshToTicket, uploadCustomDesign } = useAuth();
     const { fetchActivityLogs, onlineUsers } = useAnalytics();
     const [activeTab, setActiveTab] = useState('tickets');
     const [logs, setLogs] = useState([]);
@@ -23,6 +23,11 @@ const AdminDashboard = () => {
     const [userLogs, setUserLogs] = useState([]);
     const [deleteInput, setDeleteInput] = useState('');
     const [editForm, setEditForm] = useState({ name: '', modelType: '', stage: '', adminNotes: '' });
+
+    // Custom Design Upload State
+    const [uploadFile, setUploadFile] = useState(null);
+    const [uploadVariantName, setUploadVariantName] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
 
     // AI Generation State
     const [generatingAiFor, setGeneratingAiFor] = useState(null);
@@ -448,6 +453,34 @@ const AdminDashboard = () => {
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                     <label>Internal Admin Notes (Hidden from Client)</label>
                                     <textarea value={editForm.adminNotes} onChange={(e) => setEditForm(prev => ({ ...prev, adminNotes: e.target.value }))} rows={4} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#ffcc00', resize: 'vertical' }} placeholder="Log private vendor history here..." />
+                                </div>
+
+                                {/* Custom Design Upload */}
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem', padding: '1rem', background: 'rgba(201,169,97,0.05)', borderRadius: '8px', border: '1px solid rgba(201,169,97,0.2)' }}>
+                                    <h4 style={{ margin: 0, color: 'var(--color-accent)' }}>Upload Custom 3D Design</h4>
+                                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '0.5rem', alignItems: 'center' }}>
+                                        <input type="text" placeholder="Variant (e.g. Snake, V2)" value={uploadVariantName} onChange={(e) => setUploadVariantName(e.target.value)} style={{ padding: '0.5rem', background: '#111', border: '1px solid #333', color: '#fff', borderRadius: '4px', width: '100%' }} />
+                                        <input type="file" accept=".glb,.gltf" onChange={(e) => setUploadFile(e.target.files[0])} style={{ color: '#888', fontSize: '0.75rem', maxWidth: '100%', overflow: 'hidden' }} />
+                                    </div>
+                                    <button
+                                        className="btn btn-secondary"
+                                        style={{ padding: '0.5rem', marginTop: '0.5rem', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
+                                        disabled={isUploading || !uploadFile || !uploadVariantName}
+                                        onClick={async () => {
+                                            setIsUploading(true);
+                                            const res = await uploadCustomDesign(editingUser, uploadFile, uploadVariantName);
+                                            setIsUploading(false);
+                                            if (res.success) {
+                                                setUploadFile(null);
+                                                setUploadVariantName('');
+                                                alert("Design attached to client dashboard successfully!");
+                                            } else {
+                                                alert("Upload failed: " + res.error);
+                                            }
+                                        }}
+                                    >
+                                        {isUploading ? 'Pushing to Supabase...' : 'Push Design to Client'}
+                                    </button>
                                 </div>
 
                                 {/* Save Actions */}

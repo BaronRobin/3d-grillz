@@ -86,7 +86,8 @@ export const AuthProvider = ({ children }) => {
                     admin_notes: o.admin_notes,
                     device_os: o.device_os,
                     needs_password_change: o.needs_password_change,
-                    ai_mesh_url: o.ai_mesh_url
+                    ai_mesh_url: o.ai_mesh_url,
+                    custom_designs: o.custom_designs || []
                 });
                 setOrders(orderMap);
             }
@@ -115,7 +116,8 @@ export const AuthProvider = ({ children }) => {
                         admin_notes: data.admin_notes,
                         device_os: data.device_os,
                         needs_password_change: data.needs_password_change,
-                        ai_mesh_url: data.ai_mesh_url
+                        ai_mesh_url: data.ai_mesh_url,
+                        custom_designs: data.custom_designs || []
                     }
                 }));
             }
@@ -257,7 +259,8 @@ export const AuthProvider = ({ children }) => {
                     modelType: newOrder.model_type,
                     comments: ticket.comments,
                     needs_password_change: true,
-                    ai_mesh_url: ticket.ai_mesh_url
+                    ai_mesh_url: ticket.ai_mesh_url,
+                    custom_designs: []
                 }
             }));
 
@@ -349,6 +352,54 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Admin Action: Upload Custom 3D Design
+    const uploadCustomDesign = async (email, file, variantName) => {
+        try {
+            // 1. Upload to Supabase Storage
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${email.replace(/[^a-zA-Z0-9]/g, '_')}_${Date.now()}.${fileExt}`;
+            const filePath = `${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('designs')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            // 2. Get Public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('designs')
+                .getPublicUrl(filePath);
+
+            // 3. Append to orders.custom_designs JSONB array
+            const currentDesigns = orders[email]?.custom_designs || [];
+            const newDesign = {
+                variant_name: variantName,
+                url: publicUrl,
+                uploaded_at: new Date().toISOString()
+            };
+            const updatedDesigns = [...currentDesigns, newDesign];
+
+            const { error: dbError } = await supabase
+                .from('orders')
+                .update({ custom_designs: updatedDesigns })
+                .eq('email', email);
+
+            if (dbError) throw dbError;
+
+            // 4. Update local state
+            setOrders(prev => ({
+                ...prev,
+                [email]: { ...prev[email], custom_designs: updatedDesigns }
+            }));
+
+            return { success: true };
+        } catch (error) {
+            console.error("Failed to upload custom design:", error);
+            return { success: false, error: error.message };
+        }
+    };
+
     // Admin Action: Trigger Password Reset Loop
     const triggerPasswordReset = async (email) => {
         const { error: dbError } = await supabase.from('orders').update({ needs_password_change: true }).eq('email', email);
@@ -390,7 +441,8 @@ export const AuthProvider = ({ children }) => {
             forceUpdatePassword,
             triggerPasswordReset,
             getUserOrder,
-            saveAiMeshToTicket
+            saveAiMeshToTicket,
+            uploadCustomDesign
         }}>
             {children}
         </AuthContext.Provider>

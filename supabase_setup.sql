@@ -25,9 +25,22 @@ CREATE TABLE public.orders (
     admin_notes TEXT DEFAULT '',
     device_os TEXT NOT NULL DEFAULT 'Unknown',
     ai_mesh_url TEXT,
+    custom_designs JSONB DEFAULT '[]'::jsonb,
     needs_password_change BOOLEAN NOT NULL DEFAULT true,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- NEW COMMANDS (Run these inside Supabase SQL Editor to update live db without dropping data)
+-- ALTER TABLE public.tickets ADD COLUMN IF NOT EXISTS ai_mesh_url TEXT;
+-- ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS ai_mesh_url TEXT;
+
+-- NEW COMMANDS PHASE 10 (Run these inside Supabase SQL Editor as well)
+-- ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS custom_designs JSONB DEFAULT '[]'::jsonb;
+
+-- RUN THIS TO CREATE THE STORAGE BUCKET FOR GLB FILES:
+-- insert into storage.buckets (id, name, public) values ('designs', 'designs', true);
+-- create policy "Public Access" on storage.objects for select using ( bucket_id = 'designs' );
+-- create policy "Admin Insert" on storage.objects for insert with check ( bucket_id = 'designs' and auth.role() = 'authenticated' );
 
 -- 3. Enable Row-Level Security (RLS) to Protect Data
 ALTER TABLE public.tickets ENABLE ROW LEVEL SECURITY;
