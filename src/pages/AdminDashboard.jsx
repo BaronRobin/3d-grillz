@@ -534,13 +534,6 @@ const AdminDashboard = () => {
                                             await updateOrderDetails(editingUser, editForm);
                                             setEditingUser(null);
                                         }}>Save Changes</button>
-
-                                        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px' }} onClick={async () => {
-                                            if (window.confirm("Send a forced password reset link to this user? They will be locked out until they set a new password.")) {
-                                                await triggerPasswordReset(editingUser);
-                                                alert("Magic Link dispatched.");
-                                            }
-                                        }}>Send Reset Link</button>
                                     </div>
                                 </div>
                             </div>
