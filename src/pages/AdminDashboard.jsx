@@ -461,21 +461,21 @@ const AdminDashboard = () => {
                                         <div style={{ display: 'flex', gap: '0.5rem' }}>
                                             {(orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url) ? (
                                                 <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
-                                                    <a href={orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%' }}>
-                                                        <Box size={14} /> Download File
+                                                    <a href={orders[editingUser]?.ai_mesh_url || tickets[editingUser]?.ai_mesh_url} target="_blank" rel="noreferrer" className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', width: '100%', justifyContent: 'center' }}>
+                                                        <Box size={14} /> View Existing AI Mesh
                                                     </a>
-                                                    <button className="btn btn-secondary" style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }} onClick={() => setPreviewUser(editingUser)}>
+                                                    <button className="btn btn-secondary" style={{ padding: '0.5rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'inline-flex', alignItems: 'center', gap: '0.25rem', width: '100%', justifyContent: 'center', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }} onClick={() => setPreviewUser(editingUser)}>
                                                         <Eye size={14} /> Preview 3D
                                                     </button>
                                                 </div>
                                             ) : (
                                                 <button
                                                     className="btn btn-secondary"
-                                                    style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%' }}
+                                                    style={{ padding: '0.5rem', fontSize: '0.8rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', width: '100%', color: 'var(--color-accent)', borderColor: 'var(--color-accent)' }}
                                                     onClick={() => handleGenerateAi(editingUser, tickets[editingUser]?.comments || editForm.adminNotes || "gold customized grillz")}
                                                     disabled={generatingAiFor === editingUser}
                                                 >
-                                                    {generatingAiFor === editingUser ? 'Generating... (~15s)' : 'Generate AI Concept'}
+                                                    {generatingAiFor === editingUser ? 'Generating... (~15s)' : 'Generate Initial AI Concept'}
                                                 </button>
                                             )}
                                         </div>
@@ -485,7 +485,7 @@ const AdminDashboard = () => {
                                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
                                             <h4 style={{ margin: 0, color: 'var(--color-accent)' }}>Upload Custom 3D Design</h4>
                                             {orders[editingUser]?.custom_designs?.length > 0 && (
-                                                <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }} onClick={() => setPreviewUser(editingUser)}>
+                                                <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.75rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }} onClick={() => setPreviewUser(editingUser)}>
                                                     <Eye size={12} /> Preview Client WebGL
                                                 </button>
                                             )}
@@ -496,7 +496,7 @@ const AdminDashboard = () => {
                                         </div>
                                         <button
                                             className="btn btn-secondary"
-                                            style={{ padding: '0.6rem', fontSize: '0.85rem', width: '100%', marginTop: '0.5rem' }}
+                                            style={{ padding: '0.5rem', marginTop: '0.5rem', width: '100%', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.5px', borderColor: 'var(--color-accent)', color: 'var(--color-accent)' }}
                                             disabled={isUploading || !uploadFile || !uploadVariantName}
                                             onClick={async () => {
                                                 setIsUploading(true);
@@ -517,26 +517,20 @@ const AdminDashboard = () => {
                                 </div>
 
                                 {/* Save Actions */}
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1rem' }}>
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         {deleteInput === 'Delete' ? (
-                                            <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', background: '#ff3b30' }} onClick={async () => {
+                                            <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold', background: '#ff3b30' }} onClick={async () => {
                                                 await deleteOrder(editingUser);
                                                 setEditingUser(null);
                                             }}>Purge Order Record</button>
                                         ) : (
-                                            <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red', fontSize: '0.85rem', width: '200px' }} />
+                                            <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red', fontSize: '0.85rem' }} />
                                         )}
                                     </div>
 
-                                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                                        <button className="btn btn-secondary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }} onClick={async () => {
-                                            if (window.confirm("Send a forced password reset link to this user? They will be locked out until they set a new password.")) {
-                                                await triggerPasswordReset(editingUser);
-                                            }
-                                        }}>Send Reset Link</button>
-
-                                        <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem' }} onClick={async () => {
+                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                        <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 'bold' }} onClick={async () => {
                                             await updateOrderDetails(editingUser, editForm);
                                             setEditingUser(null);
                                         }}>Save Changes</button>
