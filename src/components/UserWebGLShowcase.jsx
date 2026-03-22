@@ -74,100 +74,95 @@ const UserWebGLShowcase = ({ designs = [], requestedMaterialName = "Gold" }) => 
     }
 
     return (
-        <section className={`webgl-section section no-padding`} id="showcase" style={{ background: 'transparent', height: '100%' }}>
-            <div className="container" style={{ height: '100%', display: 'flex', flexDirection: 'column', padding: 0 }}>
-                <div className="showcase-card fade-in-up" style={{ background: 'transparent', boxShadow: 'none', flexGrow: 1, position: 'relative' }}>
+        <div style={{ width: '100%', height: '100%', position: 'relative', overflow: 'hidden', background: 'transparent' }}>
+            {/* Top HUD: Material & View Controls */}
+            <div style={{ position: 'absolute', top: '1rem', left: '1rem', right: '1rem', display: 'flex', justifyContent: 'space-between', zIndex: 10 }}>
+                <div className="material-selector" style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', backdropFilter: 'blur(4px)' }}>
+                    {materials.map((mat, i) => (
+                        <button
+                            key={i}
+                            onClick={() => setMatIndex(i)}
+                            style={{
+                                width: '24px', height: '24px', borderRadius: '50%', background: mat.color,
+                                border: matIndex === i ? '2px solid #fff' : '2px solid transparent',
+                                cursor: 'pointer', transition: 'all 0.2s', padding: 0
+                            }}
+                            title={mat.name}
+                        />
+                    ))}
+                </div>
 
-                    {/* Top HUD: Material & View Controls */}
-                    <div style={{ position: 'absolute', top: '1rem', left: '1rem', right: '1rem', display: 'flex', justifyContent: 'space-between', zIndex: 10 }}>
-                        <div className="material-selector" style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', backdropFilter: 'blur(4px)' }}>
-                            {materials.map((mat, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => setMatIndex(i)}
-                                    style={{
-                                        width: '24px', height: '24px', borderRadius: '50%', background: mat.color,
-                                        border: matIndex === i ? '2px solid #fff' : '2px solid transparent',
-                                        cursor: 'pointer', transition: 'all 0.2s', padding: 0
-                                    }}
-                                    title={mat.name}
-                                />
-                            ))}
-                        </div>
-
-                        <div className="jaw-toggles" style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', backdropFilter: 'blur(4px)' }}>
-                            <button onClick={() => setShowUpper(!showUpper)} style={{ background: 'transparent', border: 'none', color: showUpper ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', padding: 0 }}>
-                                {showUpper ? <Eye size={16} /> : <EyeOff size={16} />} Upper
-                            </button>
-                            <button onClick={() => setShowLower(!showLower)} style={{ background: 'transparent', border: 'none', color: showLower ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', padding: 0 }}>
-                                {showLower ? <Eye size={16} /> : <EyeOff size={16} />} Lower
-                            </button>
-                        </div>
-                    </div>
-
-                    <div className="canvas-wrapper">
-                        <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
-                            <ambientLight intensity={0.5} />
-                            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-                            <Environment preset="city" />
-
-                            <React.Suspense fallback={null}>
-                                <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                                    <group>
-                                        <CustomModel
-                                            url={currentDesign.url}
-                                            materialProps={currentMat}
-                                            showUpper={showUpper}
-                                            showLower={showLower}
-                                        />
-                                    </group>
-                                </Float>
-
-                                <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
-                            </React.Suspense>
-                            <OrbitControls enableZoom={true} enablePan={false} autoRotate={false} />
-                        </Canvas>
-
-                        <div className="interaction-hint" style={{ bottom: '80px' }}>
-                            <span>Drag to Rotate | Scroll to Zoom</span>
-                        </div>
-
-                        {/* Bottom Controls: Design Variants */}
-                        {designs.length > 1 && (
-                            <div className="design-controls" style={{ bottom: '1rem' }}>
-                                <button className="control-btn" onClick={prevDesign}>
-                                    <FaChevronLeft />
-                                </button>
-                                <div className="design-info">
-                                    <h3 style={{ margin: 0, textTransform: 'capitalize' }}>{currentDesign.variant_name || `Version ${index + 1}`}</h3>
-                                    <div style={{ fontSize: '0.7rem', color: '#ffb347', marginTop: '4px', letterSpacing: '0.5px' }}>
-                                        {matIndex === defaultMatIndex ? 'REQUESTED MATERIAL' : currentMat.name.toUpperCase()}
-                                    </div>
-                                    <div className="design-indicator">
-                                        {designs.map((_, i) => (
-                                            <div key={i} className={`indicator-dot ${i === index ? 'active' : ''}`} />
-                                        ))}
-                                    </div>
-                                </div>
-                                <button className="control-btn" onClick={nextDesign}>
-                                    <FaChevronRight />
-                                </button>
-                            </div>
-                        )}
-                        {designs.length === 1 && (
-                            <div className="design-controls" style={{ bottom: '1rem', justifyContent: 'center' }}>
-                                <div className="design-info text-center">
-                                    <h3 style={{ margin: 0, textTransform: 'capitalize' }}>{currentDesign.variant_name || 'Custom 3D Design'}</h3>
-                                    <div style={{ fontSize: '0.7rem', color: '#ffb347', marginTop: '4px', letterSpacing: '0.5px' }}>
-                                        {matIndex === defaultMatIndex ? 'REQUESTED MATERIAL' : currentMat.name.toUpperCase()}
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                <div className="jaw-toggles" style={{ display: 'flex', gap: '0.5rem', background: 'rgba(0,0,0,0.5)', padding: '0.5rem', borderRadius: '8px', backdropFilter: 'blur(4px)' }}>
+                    <button onClick={() => setShowUpper(!showUpper)} style={{ background: 'transparent', border: 'none', color: showUpper ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', padding: 0 }}>
+                        {showUpper ? <Eye size={16} /> : <EyeOff size={16} />} Upper
+                    </button>
+                    <button onClick={() => setShowLower(!showLower)} style={{ background: 'transparent', border: 'none', color: showLower ? '#fff' : '#555', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', padding: 0 }}>
+                        {showLower ? <Eye size={16} /> : <EyeOff size={16} />} Lower
+                    </button>
                 </div>
             </div>
-        </section>
+
+            <div style={{ width: '100%', height: '100%', position: 'absolute', inset: 0, pointerEvents: 'auto' }}>
+                <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
+                    <ambientLight intensity={0.5} />
+                    <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+                    <Environment preset="city" />
+
+                    <React.Suspense fallback={null}>
+                        <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+                            <group>
+                                <CustomModel
+                                    url={currentDesign.url}
+                                    materialProps={currentMat}
+                                    showUpper={showUpper}
+                                    showLower={showLower}
+                                />
+                            </group>
+                        </Float>
+
+                        <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
+                    </React.Suspense>
+                    <OrbitControls enableZoom={true} enablePan={false} autoRotate={false} />
+                </Canvas>
+            </div>
+
+            <div className="interaction-hint" style={{ bottom: '80px', top: 'auto', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+                <span>Drag to Rotate | Scroll to Zoom</span>
+            </div>
+
+            {/* Bottom Controls: Design Variants */}
+            {designs.length > 1 && (
+                <div className="design-controls" style={{ bottom: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+                    <button className="control-btn" onClick={prevDesign}>
+                        <FaChevronLeft />
+                    </button>
+                    <div className="design-info">
+                        <h3 style={{ margin: 0, textTransform: 'capitalize' }}>{currentDesign.variant_name || `Version ${index + 1}`}</h3>
+                        <div style={{ fontSize: '0.7rem', color: '#ffb347', marginTop: '4px', letterSpacing: '0.5px' }}>
+                            {matIndex === defaultMatIndex ? 'REQUESTED MATERIAL' : currentMat.name.toUpperCase()}
+                        </div>
+                        <div className="design-indicator">
+                            {designs.map((_, i) => (
+                                <div key={i} className={`indicator-dot ${i === index ? 'active' : ''}`} />
+                            ))}
+                        </div>
+                    </div>
+                    <button className="control-btn" onClick={nextDesign}>
+                        <FaChevronRight />
+                    </button>
+                </div>
+            )}
+            {designs.length === 1 && (
+                <div className="design-controls" style={{ bottom: '1rem', left: '50%', transform: 'translateX(-50%)', justifyContent: 'center', zIndex: 10 }}>
+                    <div className="design-info text-center">
+                        <h3 style={{ margin: 0, textTransform: 'capitalize' }}>{currentDesign.variant_name || 'Custom 3D Design'}</h3>
+                        <div style={{ fontSize: '0.7rem', color: '#ffb347', marginTop: '4px', letterSpacing: '0.5px' }}>
+                            {matIndex === defaultMatIndex ? 'REQUESTED MATERIAL' : currentMat.name.toUpperCase()}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
     );
 };
 
