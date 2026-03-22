@@ -166,7 +166,7 @@ const AdminDashboard = () => {
                             </thead>
                             <tbody>
                                 {Object.entries(tickets || {})
-                                    .filter(([_, t]) => t.status === 'pending')
+                                    .filter(([_, t]) => (t.status || 'pending').toLowerCase() === 'pending')
                                     .map(([email, ticket]) => {
                                         const emailBody = encodeURIComponent(
                                             `Hi ${ticket.name},\n\nThank you for your quote request for ${ticket.materialId || ticket.material_id} grillz.\n\nI've reviewed your request and would love to get started. Please let me know if you have any additional details.\n\nBest,\nRobin Baron`
@@ -233,7 +233,7 @@ const AdminDashboard = () => {
                                             </tr>
                                         );
                                     })}
-                                {Object.values(tickets || {}).filter(t => t.status === 'pending').length === 0 && (
+                                {Object.values(tickets || {}).filter(t => (t.status || 'pending').toLowerCase() === 'pending').length === 0 && (
                                     <tr><td colSpan="5" style={{ padding: '2rem', textAlign: 'center', color: '#666' }}>No pending quote requests.</td></tr>
                                 )}
                             </tbody>
