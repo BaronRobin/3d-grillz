@@ -68,13 +68,14 @@
 }
 
 .materials-grid-wrapper.expanded {
-    max-height: 3200px !important;
-    /* Override all breakpoints */
+    max-height: 2500px !important;
+    /* Override all breakpoints to show everything */
 }
 
 .materials-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 350px));
+    justify-content: center;
     gap: 1.5rem;
     padding: 1rem;
 }
@@ -172,21 +173,22 @@
 
 /* Sterling Silver: Bright White/Grey */
 .mat-silver {
-    background: linear-gradient(135deg, #A9A9A9 0%, #FFFFFF 50%, #A9A9A9 100%) !important;
-    color: #333 !important;
+    background: linear-gradient(135deg, #c0c0c0 0%, #e8e8e8 50%, #a0a0a0 100%) !important;
+    color: #111 !important;
 }
 
 .mat-silver .material-header h4,
 .mat-silver .material-desc-static,
 .mat-silver .material-finish {
-    color: #222 !important;
-    text-shadow: none !important;
+    color: #111 !important;
+    text-shadow: 0 1px 1px rgba(255,255,255,0.8) !important;
+    font-weight: 700;
 }
 
 .mat-silver .material-purity {
-    color: #333 !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
-    background: rgba(0, 0, 0, 0.05) !important;
+    color: #000 !important;
+    border-color: rgba(0, 0, 0, 0.6) !important;
+    background: rgba(255, 255, 255, 0.4) !important;
 }
 
 /* Titanium: Blue-Grey Steel */
@@ -203,45 +205,12 @@
     color: #fff;
 }
 
-/* White Gold: Warm metallic white */
-.mat-white-gold {
-    background: linear-gradient(135deg, #bfbfbf 0%, #fcfcfc 50%, #bfbfbf 100%) !important;
-    color: #333 !important;
+/* Red Coating: Deep metallic red */
+.mat-red-coating {
+    background: linear-gradient(135deg, #a61c1c 0%, #ff4d4d 50%, #730f0f 100%) !important;
+    color: #fff;
+    border: 1px solid #ff4d4d;
 }
-
-.mat-white-gold .material-header h4,
-.mat-white-gold .material-desc-static,
-.mat-white-gold .material-finish {
-    color: #222 !important;
-    text-shadow: none !important;
-}
-
-.mat-white-gold .material-purity {
-    color: #333 !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-}
-
-
-/* Platinum: Cool Silver/White */
-.mat-platinum {
-    background: linear-gradient(135deg, #999999 0%, #e0e0e0 50%, #999999 100%) !important;
-    color: #333 !important;
-}
-
-.mat-platinum .material-header h4,
-.mat-platinum .material-desc-static,
-.mat-platinum .material-finish {
-    color: #222 !important;
-    text-shadow: none !important;
-}
-
-.mat-platinum .material-purity {
-    color: #333 !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-}
-
 
 /* Black Gold: Deep metallic dark */
 .mat-black-gold {
@@ -249,45 +218,31 @@
     border: 1px solid #444;
 }
 
-/* Ceramic: Clean glossy white */
-.mat-ceramic {
-    background: linear-gradient(135deg, #e3e3e3 0%, #ffffff 50%, #e3e3e3 100%) !important;
-    color: #333 !important;
-}
-
-.mat-ceramic .material-header h4,
-.mat-ceramic .material-desc-static,
-.mat-ceramic .material-finish {
-    color: #222 !important;
-    text-shadow: none !important;
-}
-
-.mat-ceramic .material-purity {
-    color: #333 !important;
-    border-color: rgba(0, 0, 0, 0.2) !important;
-    background: rgba(0, 0, 0, 0.05) !important;
-}
-
-
-/* Diamond: Icy Blue */
+/* Diamond: Dark Deep Ice */
 .mat-diamond {
-    background: linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%) !important;
-    /* Or more crystal like */
-    background: linear-gradient(135deg, #a2d9ff 0%, #ffffff 50%, #a2d9ff 100%) !important;
-    color: #004e92 !important;
+    background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%) !important;
+    color: #e0f7fa !important;
+    border: 1px solid #4dd0e1;
 }
 
 .mat-diamond .material-header h4,
 .mat-diamond .material-desc-static,
 .mat-diamond .material-finish {
-    color: #004e92 !important;
-    text-shadow: none !important;
+    color: #fff !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5) !important;
 }
 
 .mat-diamond .material-purity {
-    color: #004e92 !important;
-    border-color: rgba(0, 78, 146, 0.2) !important;
-    background: rgba(255, 255, 255, 0.4) !important;
+    color: #e0f7fa !important;
+    border-color: rgba(77, 208, 225, 0.4) !important;
+    background: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Custom Request */
+.mat-custom {
+    background: linear-gradient(135deg, #1f1c2c 0%, #3a3845 100%) !important;
+    color: #fff !important;
+    border: 1px dashed rgba(255, 255, 255, 0.4);
 }
 
 /* Process Description */
@@ -366,6 +321,8 @@
     height: 100%;
     border-radius: 20px;
     overflow: hidden;
+    -webkit-mask-image: -webkit-radial-gradient(white, black); /* For Safari rounded clipping */
+    mask-image: radial-gradient(white, black);
     z-index: 0;
     /* DYNAMIC SHADOWS via CSS Vars */
     /* We expect --shadow-x and --shadow-y from JS. Default to 0. */
@@ -375,6 +332,30 @@
     /* Static subtle border */
     transform: translateZ(0);
     transition: box-shadow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Scratched Metal Micro-Texture Overlay */
+.material-layer-bg::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    z-index: 1;
+    background-image: repeating-linear-gradient(
+        45deg,
+        rgba(0, 0, 0, 0.04) 0px,
+        rgba(0, 0, 0, 0.04) 1px,
+        transparent 1px,
+        transparent 3px
+    ),
+    repeating-linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.03) 0px,
+        rgba(255, 255, 255, 0.03) 1px,
+        transparent 1px,
+        transparent 4px
+    );
+    mix-blend-mode: overlay;
 }
 
 /* SPECULAR BEZEL LIGHTING */

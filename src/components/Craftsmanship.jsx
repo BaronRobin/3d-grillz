@@ -147,7 +147,10 @@ const Material3DCard = ({ material, isGyroEnabled, onRequestPermission }) => {
 
     return (
         <div
+            ref={cardRef}
             className="material-card-wrapper-3d"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
             onClick={() => {
                 // Haptic feedback on interact/unlock
                 if (navigator.vibrate) navigator.vibrate(15);
@@ -155,10 +158,7 @@ const Material3DCard = ({ material, isGyroEnabled, onRequestPermission }) => {
             }}
         >
             <div
-                ref={cardRef}
                 className="material-card-3d"
-                onMouseMove={handleMouseMove}
-                onMouseLeave={handleMouseLeave}
                 style={style}
             >
                 {/* Background Layer with Glare - Clipped */}
@@ -220,7 +220,7 @@ const Craftsmanship = () => {
         { label: 'Precision', start: 10, end: 0.01, suffix: ' mm', icon: '', decimals: 2 }
     ];
 
-    const allMaterials = [
+    const coreMaterials = [
         {
             name: 'Gold',
             purity: '18K',
@@ -250,32 +250,28 @@ const Craftsmanship = () => {
             className: 'mat-rose'
         },
         {
-            name: 'White Gold',
-            purity: '18K',
-            finish: 'Rhodium',
-            desc: 'Bright, reflective, and hypoallergenic.',
-            className: 'mat-white-gold'
-        },
-        {
             name: 'Black Gold',
             purity: '18K',
             finish: 'Matte',
-            desc: 'Edgy, sophisticated dark finish.',
+            desc: 'A sophisticated dark finish.',
             className: 'mat-black-gold'
         },
         {
-            name: 'Ceramic',
-            purity: 'Zirconia',
-            finish: 'Glazed',
-            desc: 'Details so fine they look liquid.',
-            className: 'mat-ceramic'
-        },
+            name: 'Custom Request',
+            purity: 'Custom',
+            finish: 'Your Choice',
+            desc: 'Open to new material ideas, provided they meet strict dental safety standards.',
+            className: 'mat-custom'
+        }
+    ];
+
+    const additionalOptions = [
         {
-            name: 'Platinum',
-            purity: '950',
-            finish: 'Polished',
-            desc: 'The ultimate symbol of prestige.',
-            className: 'mat-platinum'
+            name: 'Color Coating',
+            purity: 'Custom',
+            finish: 'Cerakote',
+            desc: 'Vibrant ceramic coatings, e.g. Cherry Red on Silver.',
+            className: 'mat-red-coating'
         },
         {
             name: 'VVS Diamond',
@@ -283,6 +279,7 @@ const Craftsmanship = () => {
             finish: 'Pavé',
             desc: 'Hand-set stones for maximum brilliance.',
             className: 'mat-diamond'
+
         }
     ];
 
@@ -323,8 +320,24 @@ const Craftsmanship = () => {
 
                     <div className={`materials-grid-wrapper ${showAllMaterials ? 'expanded' : ''}`}>
                         <div className="materials-grid">
-                            {allMaterials.map((material, index) => (
+                            {coreMaterials.map((material, index) => (
                                 <div key={index} className="fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                                    <Material3DCard
+                                        material={material}
+                                        isGyroEnabled={isGyroEnabled}
+                                        onRequestPermission={handlePermissionRequest}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="additional-finishes-divider">
+                            <h4 style={{ textAlign: 'center', color: 'var(--color-accent)', margin: '2rem 0 1rem', fontSize: '1.4rem' }}>Additional Add-ons</h4>
+                        </div>
+
+                        <div className="materials-grid">
+                            {additionalOptions.map((material, index) => (
+                                <div key={`add-${index}`} className="fade-in-up" style={{ animationDelay: `${(index + coreMaterials.length) * 100}ms` }}>
                                     <Material3DCard
                                         material={material}
                                         isGyroEnabled={isGyroEnabled}

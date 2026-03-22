@@ -25,3 +25,4 @@ dist-ssr
 .env
 supabase_setup.sql
 APP_EXPLANATION.md
+todo-*.md

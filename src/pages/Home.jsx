@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import Hero from '../components/Hero';
-import WebGLShowcase from '../components/WebGLShowcase';
+
 import BehindTheDesign from '../components/BehindTheDesign';
 import DigitalPipeline from '../components/DigitalPipeline';
 import Craftsmanship from '../components/Craftsmanship';
@@ -16,7 +16,6 @@ const Home = () => {
     return (
         <div className="home-container">
             <Hero />
-            <WebGLShowcase />
 
             <div id="process">
                 <DigitalPipeline />

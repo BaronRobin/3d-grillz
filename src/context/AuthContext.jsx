@@ -14,6 +14,8 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [orders, setOrders] = useState({}); // Stores realtime active orders
     const [tickets, setTickets] = useState({}); // Stores realtime quote requests
+    const [messages, setMessages] = useState({}); // Stores in-app messages keyed by order_email
+    const [allUsers, setAllUsers] = useState([]); // All registered profiles
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -87,10 +89,16 @@ export const AuthProvider = ({ children }) => {
                     device_os: o.device_os,
                     needs_password_change: o.needs_password_change,
                     ai_mesh_url: o.ai_mesh_url,
-                    custom_designs: o.custom_designs || []
+                    custom_designs: o.custom_designs || [],
+                    original_quote: o.original_quote || null
                 });
                 setOrders(orderMap);
             }
+
+            // Fetch all user profiles
+            const { data: profileData } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+            if (profileData) setAllUsers(profileData);
+
         } catch (e) {
             console.error("Error fetching admin data:", e);
         }
@@ -117,9 +125,13 @@ export const AuthProvider = ({ children }) => {
                         device_os: data.device_os,
                         needs_password_change: data.needs_password_change,
                         ai_mesh_url: data.ai_mesh_url,
-                        custom_designs: data.custom_designs || []
+                        custom_designs: data.custom_designs || [],
+                        original_quote: data.original_quote || null
                     }
                 }));
+
+                // Fetch this user's messages
+                fetchMessages(email);
             }
         } catch (e) {
             console.error("Error fetching user data:", e);
@@ -239,7 +251,17 @@ export const AuthProvider = ({ children }) => {
             history: [{ stage: 'Quote Approved & Email Sent', date: new Date().toLocaleDateString() }],
             comments: ticket.comments,
             device_os: ticket.device_os,
-            ai_mesh_url: ticket.ai_mesh_url
+            ai_mesh_url: ticket.ai_mesh_url,
+            // Snapshot the full original ticket so it's never lost
+            original_quote: {
+                name: ticket.name,
+                email: email,
+                material_id: ticket.material_id,
+                comments: ticket.comments,
+                device_os: ticket.device_os,
+                created_at: ticket.created_at,
+                status: 'approved'
+            }
         };
 
         // Fire both queries to sync databases
@@ -260,7 +282,8 @@ export const AuthProvider = ({ children }) => {
                     comments: ticket.comments,
                     needs_password_change: true,
                     ai_mesh_url: ticket.ai_mesh_url,
-                    custom_designs: []
+                    custom_designs: [],
+                    original_quote: newOrder.original_quote
                 }
             }));
 
@@ -447,15 +470,70 @@ export const AuthProvider = ({ children }) => {
         };
     };
 
+    // --- In-App Messaging ---
+
+    const fetchMessages = async (orderEmail) => {
+        const { data, error } = await supabase
+            .from('messages')
+            .select('*')
+            .eq('order_email', orderEmail)
+            .order('created_at', { ascending: true });
+
+        if (!error && data) {
+            setMessages(prev => ({ ...prev, [orderEmail]: data }));
+        }
+    };
+
+    const sendMessage = async (orderEmail, body) => {
+        const sender = user?.role === 'admin' ? 'admin' : user?.email;
+        const newMsg = {
+            order_email: orderEmail,
+            sender,
+            body,
+            read: false
+        };
+
+        const { data, error } = await supabase.from('messages').insert([newMsg]).select().single();
+
+        if (!error && data) {
+            setMessages(prev => ({
+                ...prev,
+                [orderEmail]: [...(prev[orderEmail] || []), data]
+            }));
+        } else {
+            console.error('Failed to send message:', error);
+        }
+    };
+
+    const markMessagesRead = async (orderEmail) => {
+        // Mark all messages in this thread as read for the other party
+        const senderFilter = user?.role === 'admin' ? user?.email : 'admin';
+        await supabase
+            .from('messages')
+            .update({ read: true })
+            .eq('order_email', orderEmail)
+            .neq('sender', senderFilter);
+
+        setMessages(prev => ({
+            ...prev,
+            [orderEmail]: (prev[orderEmail] || []).map(m =>
+                m.sender !== user.email ? { ...m, read: true } : m
+            )
+        }));
+    };
+
     return (
         <AuthContext.Provider value={{
             user,
             orders,
             tickets,
+            messages,
+            allUsers,
             loading,
             login,
             sendMagicLink,
             logout,
+            fetchAdminData,
             updateOrderStatus,
             submitQuoteRequest,
             approveTicket,
@@ -466,7 +544,10 @@ export const AuthProvider = ({ children }) => {
             triggerPasswordReset,
             getUserOrder,
             saveAiMeshToTicket,
-            uploadCustomDesign
+            uploadCustomDesign,
+            sendMessage,
+            fetchMessages,
+            markMessagesRead
         }}>
             {children}
         </AuthContext.Provider>

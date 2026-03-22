@@ -1,14 +1,76 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Float, Environment, ContactShadows, useGLTF } from '@react-three/drei';
 import { FaChevronRight, FaChevronLeft } from 'react-icons/fa';
 import './WebGLShowcase.css';
 
+// Error Boundary for the WebGL Canvas
+class CanvasErrorBoundary extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = { hasError: false };
+    }
+
+    static getDerivedStateFromError() {
+        return { hasError: true };
+    }
+
+    componentDidCatch(error) {
+        console.warn('WebGL Canvas error caught by boundary:', error.message);
+    }
+
+    render() {
+        if (this.state.hasError) {
+            return (
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    height: '100%',
+                    minHeight: '300px',
+                    gap: '1rem',
+                    color: '#666'
+                }}>
+                    <div style={{ fontSize: '2rem' }}>⬡</div>
+                    <p style={{ fontSize: '0.9rem', color: '#555', margin: 0 }}>3D model unavailable</p>
+                    <p style={{ fontSize: '0.75rem', color: '#444', margin: 0 }}>The model could not be loaded.</p>
+                </div>
+            );
+        }
+        return this.props.children;
+    }
+}
+
+// Loading fallback while model fetches
+const ModelLoader = () => (
+    <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        minHeight: '300px',
+        gap: '1rem',
+        color: '#666'
+    }}>
+        <div style={{
+            width: '40px',
+            height: '40px',
+            border: '3px solid rgba(201,169,97,0.3)',
+            borderTopColor: 'var(--color-accent)',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+        }} />
+        <p style={{ fontSize: '0.85rem', color: '#888', margin: 0 }}>Loading 3D model...</p>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+    </div>
+);
+
 const CustomModel = ({ url, color, roughness }) => {
     const { scene } = useGLTF(url);
 
-    // Dynamically apply gold/silver/etc materials over the AI generated mesh
     React.useEffect(() => {
         if (scene) {
             scene.traverse((child) => {
@@ -26,17 +88,6 @@ const CustomModel = ({ url, color, roughness }) => {
     return <primitive object={scene} scale={2} />;
 };
 
-/**
- * Custom 3D Model Component for the WebGL Showcase.
- * Handles the rotation animation for the rendered geometry.
- * @param {Object} props
- * @param {boolean} props.visible - Whether the model is visible.
- * @param {number} props.geometryType - The index determining which geometry to render.
- * @param {string} props.color - Hex color for the material.
- * @param {number} props.roughness - Material roughness.
- * @param {string} [props.modelUrl] - Optional external .glb URL from Tripo3D
- * @returns {JSX.Element}
- */
 const GrillModel = ({ visible, geometryType, color = "#eec95e", roughness = 0.1, modelUrl }) => {
     const mesh = useRef();
 
@@ -48,10 +99,12 @@ const GrillModel = ({ visible, geometryType, color = "#eec95e", roughness = 0.1,
         }
     });
 
-    if (modelUrl) {
+    if (modelUrl && typeof modelUrl === 'string' && modelUrl.trim() !== '') {
         return (
             <group dispose={null} ref={mesh} visible={visible}>
-                <CustomModel url={modelUrl} color={color} roughness={roughness} />
+                <Suspense fallback={null}>
+                    <CustomModel url={modelUrl} color={color} roughness={roughness} />
+                </Suspense>
             </group>
         );
     }
@@ -73,20 +126,14 @@ const GrillModel = ({ visible, geometryType, color = "#eec95e", roughness = 0.1,
     );
 };
 
-/**
- * WebGL Showcase Component that renders interactive 3D models using React Three Fiber.
- * @param {Object} props
- * @param {Object} [props.forcedMaterial] - Optional material override properties {color, roughness}
- * @param {boolean} [props.hideHeader] - If true, hides the "Interactive Showcase" header
- * @param {string} [props.modelUrl] - External Tripo3D .glb AI mesh
- * @returns {JSX.Element}
- */
 const WebGLShowcase = ({ forcedMaterial, hideHeader = false, modelUrl }) => {
     const [index, setIndex] = useState(0);
     const designs = modelUrl ? ['Your AI Design Estimation'] : ['Custom Molded Gold', 'Classic Grill', 'Diamond Cut'];
 
     const nextDesign = () => setIndex((prev) => (prev + 1) % designs.length);
     const prevDesign = () => setIndex((prev) => (prev - 1 + designs.length) % designs.length);
+
+    const validModelUrl = modelUrl && typeof modelUrl === 'string' && modelUrl.trim() !== '' ? modelUrl : null;
 
     return (
         <section className={`webgl-section section ${hideHeader ? 'no-padding' : ''}`} id="showcase" style={hideHeader ? { background: 'transparent' } : {}}>
@@ -99,30 +146,33 @@ const WebGLShowcase = ({ forcedMaterial, hideHeader = false, modelUrl }) => {
 
                 <div className="showcase-card fade-in-up" style={{ background: 'transparent', boxShadow: 'none', flexGrow: 1 }}>
                     <div className="canvas-wrapper">
-                        <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
-                            <ambientLight intensity={0.5} />
-                            <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-                            <Environment preset="city" />
+                        <CanvasErrorBoundary>
+                            <Suspense fallback={<ModelLoader />}>
+                                <Canvas camera={{ position: [0, 0, 4], fov: 45 }}>
+                                    <ambientLight intensity={0.5} />
+                                    <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+                                    <Environment preset="city" />
 
-                            <Float speed={4} rotationIntensity={1} floatIntensity={2}>
-                                <GrillModel
-                                    geometryType={index}
-                                    visible={true}
-                                    color={forcedMaterial ? forcedMaterial.color : (index === 2 ? "#b9f2ff" : "#eec95e")}
-                                    roughness={forcedMaterial ? forcedMaterial.roughness : 0.1}
-                                    modelUrl={modelUrl}
-                                />
-                            </Float>
+                                    <Float speed={4} rotationIntensity={1} floatIntensity={2}>
+                                        <GrillModel
+                                            geometryType={index}
+                                            visible={true}
+                                            color={forcedMaterial ? forcedMaterial.color : (index === 2 ? "#b9f2ff" : "#eec95e")}
+                                            roughness={forcedMaterial ? forcedMaterial.roughness : 0.1}
+                                            modelUrl={validModelUrl}
+                                        />
+                                    </Float>
 
-                            <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
-                            <OrbitControls enableZoom={true} enablePan={false} autoRotate />
-                        </Canvas>
+                                    <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
+                                    <OrbitControls enableZoom={true} enablePan={false} autoRotate />
+                                </Canvas>
+                            </Suspense>
+                        </CanvasErrorBoundary>
 
                         <div className="interaction-hint">
                             <span>Drag to Rotate | Scroll to Zoom</span>
                         </div>
 
-                        {/* Top Right Controls */}
                         <div className="view-controls">
                             <button
                                 className="view-btn"
@@ -140,31 +190,30 @@ const WebGLShowcase = ({ forcedMaterial, hideHeader = false, modelUrl }) => {
                             >
                                 ⛶
                             </button>
-                            {/* AR Button removed as requested */}
                         </div>
 
                         <div className="design-controls">
-                            {!modelUrl && (
+                            {!validModelUrl && (
                                 <button className="control-btn" onClick={prevDesign}>
                                     <FaChevronLeft />
                                 </button>
                             )}
                             <div className="design-info">
                                 <h3>{designs[index]}</h3>
-                                {!modelUrl && (
+                                {!validModelUrl && (
                                     <div className="design-indicator">
                                         {designs.map((_, i) => (
                                             <div key={i} className={`indicator-dot ${i === index ? 'active' : ''}`} />
                                         ))}
                                     </div>
                                 )}
-                                {modelUrl && (
+                                {validModelUrl && (
                                     <div style={{ fontSize: '0.7rem', color: '#ffb347', marginTop: '4px', letterSpacing: '0.5px' }}>
                                         AI-GENERATED APPROXIMATION
                                     </div>
                                 )}
                             </div>
-                            {!modelUrl && (
+                            {!validModelUrl && (
                                 <button className="control-btn" onClick={nextDesign}>
                                     <FaChevronRight />
                                 </button>

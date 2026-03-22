@@ -3,9 +3,8 @@ import { useAuth } from '../context/AuthContext';
 import { Link, Navigate } from 'react-router-dom';
 import WebGLShowcase from '../components/WebGLShowcase';
 import UserWebGLShowcase from '../components/UserWebGLShowcase';
+import MessageThread from '../components/MessageThread';
 import {
-    FiMail,
-    FiPhone,
     FiCheckCircle,
     FiActivity
 } from 'react-icons/fi';
@@ -13,7 +12,8 @@ import {
     Layers,
     ExternalLink,
     Zap,
-    Box
+    Box,
+    MessageSquare
 } from 'lucide-react';
 
 /**
@@ -196,30 +196,22 @@ const Dashboard = () => {
                                 <span style={{ fontWeight: '600' }}>{['Custom Molded', 'Classic Edition', 'Diamond Limited'][order.modelType]}</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <span style={{ color: '#888', fontSize: '0.85rem' }}>Material</span>
-                                <span style={{ fontWeight: '600' }}>18k Yellow Gold</span>
+                                <span style={{ color: '#888', fontSize: '0.85rem' }}>Requested Material</span>
+                                <span style={{ fontWeight: '600', textTransform: 'capitalize' }}>
+                                    {order.original_quote?.material_id || (['18k Yellow Gold', 'Sterling Silver', 'Diamond Cut'][order.modelType] || '18k Yellow Gold')}
+                                </span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0' }}>
                                 <span style={{ color: '#888', fontSize: '0.85rem' }}>Order Date</span>
-                                <span style={{ fontWeight: '600' }}>{order.history?.[0]?.date || 'Today'}</span>
+                                <span style={{ fontWeight: '600' }}>{order.original_quote?.created_at ? new Date(order.original_quote.created_at).toLocaleDateString() : (order.history?.[0]?.date || 'Today')}</span>
                             </div>
                         </div>
                     </BentoTile>
 
-                    {/* TILE 5: QUICK ACTIONS */}
-                    <BentoTile title="Deep Interaction" icon={Zap} gridArea="actions" delay={0.3}>
-                        <div style={{ display: 'flex', gap: '0.75rem', height: '100%', alignItems: 'center' }}>
-                            <Link to="/ar-experience" className="btn btn-primary" style={{ flex: 1, padding: '0.75rem', fontSize: '0.8rem' }}>
-                                <Box size={16} /> AR VR
-                            </Link>
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                <button className="btn btn-secondary btn-icon" title="Mail" onClick={() => window.location.href = 'mailto:contact@baron.com'}>
-                                    <FiMail size={18} />
-                                </button>
-                                <button className="btn btn-secondary btn-icon" title="Call" onClick={() => window.location.href = 'tel:+1234567890'}>
-                                    <FiPhone size={18} />
-                                </button>
-                            </div>
+                    {/* TILE 5: MESSAGING */}
+                    <BentoTile title="Messages" icon={MessageSquare} gridArea="actions" delay={0.3}>
+                        <div style={{ height: '260px' }}>
+                            <MessageThread orderEmail={user.email} label="Chat with your designer" />
                         </div>
                     </BentoTile>
 

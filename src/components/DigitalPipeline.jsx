@@ -1,42 +1,51 @@
 import React from 'react';
 import './DigitalPipeline.css';
-// Icons removed as requested
 
 /**
- * DigitalPipeline Component displaying the steps of the digital workflow.
- * @returns {JSX.Element}
+ * DigitalPipeline Component displaying the 8 steps of the full-service workflow.
+ * Features hover-activated descriptions over looping background videos.
  */
 const DigitalPipeline = () => {
     const pipelineSteps = [
         {
-            number: '01',
-            title: '3D Scanning',
-            description: 'High-Fidelity Intraoral Scanners capture dental geometry with sub-millimeter precision, creating a perfect digital impression.',
-            tech: ['Structured Light', 'Laser Triangulation', 'STL Export']
+            number: '01', title: 'Request',
+            description: 'Initiate your custom grillz journey directly from our digital shop. No physical meetups required.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
         },
         {
-            number: '02',
-            title: 'Digital Modeling',
-            description: 'Procedural design and sculpting in Blender and Houdini transform anatomical data into artistic wearable forms.',
-            tech: ['Blender', 'Houdini', 'Parametric Design']
+            number: '02', title: 'Consultation',
+            description: 'Get in direct, 1-on-1 contact with designer Robin Baron to discuss your exact vision, material, and fit.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
         },
         {
-            number: '03',
-            title: 'AR Visualization',
-            description: 'Unreal Engine and ARKit enable real-time preview with photorealistic materials and spatial tracking for immersive visualization.',
-            tech: ['Unreal Engine', 'ARKit', 'PBR Materials']
+            number: '03', title: 'Imprint & Scan',
+            description: 'Provide a standard physical teeth imprint mold, or send over a high-fidelity 3D intraoral scan.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
         },
         {
-            number: '04',
-            title: 'Fabrication',
-            description: 'Additive manufacturing through SLA printing or direct metal laser sintering brings digital designs into physical reality.',
-            tech: ['SLA Printing', 'DMLS', 'Investment Casting']
+            number: '04', title: '3D Design',
+            description: 'We meticulously sculpt and design your custom idea into a photorealistic 3D printable model.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
         },
         {
-            number: '05',
-            title: 'Hand Finishing',
-            description: 'The raw casting is hand-polished, stones are bead-set under microscope, and final fit is verified manually.',
-            tech: ['Polishing', 'Stone Setting', 'Quality Control']
+            number: '05', title: 'Dashboard',
+            description: 'Log in to your exclusive client dashboard to review live design progress and interactive 3D variants.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
+        },
+        {
+            number: '06', title: 'Checkout',
+            description: 'Approve your final chosen 3D design variant and securely process your payment online.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
+        },
+        {
+            number: '07', title: 'Craftsmanship',
+            description: 'The raw casting is meticulously hand-finished and polished. Premium stones are bead-set under microscope.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
+        },
+        {
+            number: '08', title: 'Shipping',
+            description: 'Your finished custom masterpiece is securely packaged and shipped fully insured, directly to your door.',
+            videoSrc: '/assets/pipeline-placeholder.mp4'
         }
     ];
 
@@ -44,26 +53,36 @@ const DigitalPipeline = () => {
         <section className="digital-pipeline section" id="pipeline">
             <div className="container">
                 <div className="section-header fade-in-up">
-                    <h2>The Digital Pipeline</h2>
-                    <p className="section-subtitle">
-                        A seamless workflow from scan to sparkle
+                    <h2 style={{ fontSize: '3.5rem', marginBottom: '10px' }}>The 0-100 Pipeline</h2>
+                    <p className="section-subtitle" style={{ fontSize: '1.2rem', color: '#aaa', maxWidth: '600px', margin: '0 auto' }}>
+                        A completely seamless digital workflow from initial request to final sparkle. Hover over any step to explore.
                     </p>
                 </div>
 
-                <div className="pipeline-timeline">
+                <div className="pipeline-grid">
                     {pipelineSteps.map((step, index) => (
                         <div
                             key={step.number}
-                            className={`pipeline-step glass-dark fade-in-up stagger-${index + 1}`}
+                            className={`pipeline-card fade-in-up stagger-${index + 1}`}
                         >
-                            <div className="step-number gradient-text">{step.number}</div>
+                            <video 
+                                className="pipeline-video" 
+                                autoPlay 
+                                loop 
+                                muted 
+                                playsInline 
+                                src={step.videoSrc}
+                            ></video>
+                            
+                            <div className="pipeline-overlay"></div>
+
                             <div className="step-content">
-                                <h3>{step.title}</h3>
-                                <p>{step.description}</p>
-                                <div className="tech-tags">
-                                    {step.tech.map((tech, i) => (
-                                        <span key={i} className="tech-tag">{tech}</span>
-                                    ))}
+                                <div className="step-header">
+                                    <span className="step-number gradient-text">{step.number}</span>
+                                    <h3 className="step-title">{step.title}</h3>
+                                </div>
+                                <div className="step-body">
+                                    <p className="step-description">{step.description}</p>
                                 </div>
                             </div>
                         </div>

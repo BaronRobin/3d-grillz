@@ -21,42 +21,22 @@ const AboutMe = () => {
                         <div className="about-header-combined">
                             <div className="about-title-block">
                                 <span className="greeting">The Creator</span>
-                                <h2>Rob</h2>
+                                <h2>Robin Baron</h2>
                             </div>
-                            <div className="about-photo-mini">
-                                {/* Placeholder for user photo */}
-                                <div className="photo-placeholder-mini">
-                                </div>
+                            <div className="about-photo-mini" style={{ border: '2px solid var(--color-accent)' }}>
+                                <img src="https://baronrobin.github.io/profile.webp?v=3" alt="Robin Baron" className="about-photo" />
                             </div>
                         </div>
 
-                        <p className="about-text">
-                            A multidisciplinary designer blending technical precision with artistic vision.
-                            Specializing in procedural design and photorealistic rendering to bring
-                            digital jewelry concepts to life.
-                        </p>
+                        {/* Text removed per user request */}
 
-                        {/* Vision collapsed into text */}
-                        <p className="about-vision-text">
-                            Restoring the soul of digital objects through imperfection and detail.
-                            Exploring the intersection of fashion, technology, and identity.
-                        </p>
+                        {/* Quotes removed per user request */}
 
-                        <div className="skills-container" style={{ border: 'none' }}>
-                            <div className="skill-category">
-                                <h4>Design Stack</h4>
-                                <ul>
-                                    <li>Blender</li>
-                                    <li>Houdini</li>
-                                    <li>Adobe CC</li>
-                                    {/* C4D & Octane removed */}
-                                </ul>
-                            </div>
-                        </div>
+                        {/* Design Stack removed per user request */}
 
                         <div className="about-cta" style={{ marginBottom: '3rem' }}>
-                            <button className="btn btn-primary" onClick={() => window.location.href = 'mailto:contact@stuffmadebyrob.com'}>
-                                Get in Touch
+                            <button className="btn btn-primary" onClick={() => window.open('https://baronrobin.github.io/', '_blank', 'noopener,noreferrer')}>
+                                Learn More
                             </button>
                         </div>
 

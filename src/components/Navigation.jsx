@@ -50,10 +50,7 @@ const Navigation = () => {
 
                 <ul className={`nav-menu ${isOpen ? 'active' : ''}`}>
                     <li className="nav-item">
-                        <span className="nav-link" onClick={() => handleNavClick('process')}>Process</span>
-                    </li>
-                    <li className="nav-item">
-                        <span className="nav-link" onClick={() => handleNavClick('craft')}>Craft</span>
+                        <span className="nav-link" onClick={() => handleNavClick('process')}>How it works</span>
                     </li>
                     <li className="nav-item">
                         <Link to="/shop" className="nav-link" onClick={() => setIsOpen(false)}>Shop</Link>

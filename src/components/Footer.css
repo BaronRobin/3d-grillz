@@ -64,20 +64,36 @@
     transition: all 0.3s ease;
     font-size: 0.95rem;
     text-align: left;
+    position: relative;
 }
 
 .footer-link:hover,
 .footer-nav-btn:hover {
     color: var(--color-accent);
-    padding-left: 0;
-    /* Prevent shift */
     /* optional: add subtle glow or underline? User said "explore side" effect.
-       "use the hover effect from the explore side". The explore side WAS shifting. 
+       "use the hover effect from the explore side". The explore side WAS shifting.
        "the other one is cool but shifts the entire div".
        Wait, "just use the hover effect from the explore side."
        "The different hover effects in the footer are also concerning."
        I will just make them consistent. No shift. text color change.
     */
+}
+
+.footer-link::after,
+.footer-nav-btn::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--color-accent);
+    transition: width 0.3s ease;
+}
+
+.footer-link:hover::after,
+.footer-nav-btn:hover::after {
+    width: 100%;
 }
 
 .footer-bottom {

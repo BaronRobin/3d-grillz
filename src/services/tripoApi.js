@@ -13,7 +13,7 @@ export const generateGrillzMesh = async (userDescription) => {
     }
 
     // The hidden system prompt that strictly formats the user's idea
-    const systemPrompt = `generate a highly detailed set of upper and lower grillz, capturing the full dental arc conforming to a human teeth model. Photorealistic style, metallic surface. User design request: ${userDescription}`;
+    const systemPrompt = `A flawless, isolated 3D model of custom dental grillz jewelry, floating on a neutral background. NO face, NO lips, NO skin, NO gums. Only the metallic upper and lower dental arch. Highly detailed, photorealistic, studio lighting. User design request: ${userDescription}`;
 
     try {
         const CORS_PROXY = 'https://corsproxy.io/?';

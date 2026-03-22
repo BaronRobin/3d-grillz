@@ -238,21 +238,6 @@ a {
   position: relative;
 }
 
-a::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0;
-  height: 2px;
-  background: var(--color-accent);
-  transition: width var(--transition-base);
-}
-
-a:hover::after {
-  width: 100%;
-}
-
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 10px;

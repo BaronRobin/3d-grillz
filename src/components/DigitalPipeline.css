@@ -1,101 +1,145 @@
+/* DigitalPipeline.css - Refactored for Video Grid Hovers */
+
 .digital-pipeline {
-    background: transparent;
+    background-color: var(--color-bg);
+    padding: 100px 0;
     position: relative;
     overflow: hidden;
 }
 
-/* Big vertical line removed */
+.pipeline-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 60px;
+}
 
-.pipeline-timeline {
+@media (max-width: 1200px) {
+    .pipeline-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .pipeline-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .pipeline-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.pipeline-card {
     position: relative;
-    max-width: 900px;
-    margin: 0 auto;
+    height: 320px;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #111;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
+}
+
+.pipeline-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(228, 197, 105, 0.2);
+    border-color: rgba(228, 197, 105, 0.3); /* Accent border on hover */
+    z-index: 10;
+}
+
+.pipeline-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 1;
+    opacity: 0.6;
+    transition: opacity 0.5s ease, filter 0.5s ease;
+    filter: grayscale(80%) sepia(20%) hue-rotate(5deg); /* Cyber-ish tint */
+}
+
+/* On hover, dramatically dim and blur the video to make text readable */
+.pipeline-card:hover .pipeline-video {
+    opacity: 0.2;
+    filter: blur(4px) grayscale(100%);
+}
+
+.pipeline-overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.9) 0%, rgba(10, 10, 10, 0.2) 100%);
+    z-index: 2;
+    transition: background 0.4s ease;
+}
+
+.pipeline-card:hover .pipeline-overlay {
+    background: linear-gradient(to top, rgba(10, 10, 10, 0.95) 0%, rgba(10, 10, 10, 0.8) 100%);
+}
+
+.step-content {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 3;
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-lg);
+    justify-content: space-between;
+    padding: 30px 25px;
+    padding-bottom: 20px;
 }
 
-.pipeline-step {
-    position: relative;
-    padding: var(--spacing-md);
+.step-header {
     display: flex;
-    gap: var(--spacing-md);
+    flex-direction: column;
     align-items: flex-start;
-    transition: all var(--transition-base);
-    /* Ensure no borders if "stripes" meant borders */
-    border: none !important;
-}
-
-/* Subtle hover only */
-.pipeline-step:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.05);
-    /* Slightly lighter */
 }
 
 .step-number {
     font-size: 3rem;
     font-weight: 800;
-    letter-spacing: -2px;
+    font-family: var(--font-accent);
     line-height: 1;
-    /* Helps alignment */
-    flex-shrink: 0;
-    min-width: 80px;
-    margin-top: -5px;
-    /* Visual tweak to align top of number with top of H3 text */
+    margin-bottom: 10px;
+    opacity: 0.8;
 }
 
-.step-content {
-    flex: 1;
-}
-
-.step-content h3 {
-    font-size: var(--font-size-lg);
-    margin-bottom: var(--spacing-sm);
+.step-title {
+    font-size: 1.6rem;
+    margin: 0;
     color: var(--color-text);
-    line-height: 1;
-    /* Align with number */
-    margin-top: 0;
+    transition: transform 0.4s ease, color 0.4s ease;
 }
 
-.step-content p {
-    margin-bottom: var(--spacing-sm);
-    line-height: 1.8;
-}
-
-.tech-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-top: var(--spacing-sm);
-}
-
-.tech-tag {
-    padding: 0.4rem 1rem;
-    background: rgba(201, 169, 97, 0.1);
-    /* Border removed to avoid "stripes" feel */
-    border-radius: 20px;
-    font-size: 0.75rem;
+.pipeline-card:hover .step-title {
     color: var(--color-accent);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    transition: all var(--transition-fast);
+    transform: translateY(-5px);
 }
 
-.tech-tag:hover {
-    background: rgba(201, 169, 97, 0.2);
-    transform: translateY(-2px);
+.step-body {
+    position: relative;
+    height: 120px; /* Room for description */
+    display: flex;
+    align-items: flex-end;
+    overflow: hidden;
 }
 
-@media (max-width: 768px) {
-    .pipeline-step {
-        flex-direction: column;
-    }
+.step-description {
+    font-size: 1.05rem;
+    color: #dedede;
+    line-height: 1.5;
+    margin: 0;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
 
-    .step-number {
-        font-size: 2rem;
-        min-width: auto;
-        margin-top: 0;
-    }
+/* Show the text explanation ONLY when hovering the card */
+.pipeline-card:hover .step-description {
+    opacity: 1;
+    transform: translateY(0);
 }
