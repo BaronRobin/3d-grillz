@@ -1,5 +1,30 @@
 export const changelogData = [
     {
+        version: "v0.8.5",
+        changes: [
+            "Reworked admin dashboard: replaced order table with visual Kanban pipeline board.",
+            "Added All Users panel powered by Supabase profiles table.",
+            "Added Messages tab in admin dashboard with per-order chat threads.",
+            "Introduced in-app messaging on user dashboard — replacing external contact buttons.",
+            "Quote details (material, notes, date, device) now preserved as a snapshot on order approval.",
+            "Auto pre-filled email draft button on incoming quote requests.",
+            "Fixed WebGL 3D model viewer crash with Suspense and ErrorBoundary.",
+            "User dashboard Material Blueprint tile now shows the actual requested material."
+        ]
+    },
+    {
+        version: "v0.8.0",
+        changes: [
+            "Overhauled landing page hero section with full-service digital hub messaging.",
+            "Redesigned Digital Pipeline to 8-step process with video hover effects.",
+            "Removed interactive showcase and streamlined the landing page layout.",
+            "Refined material cards: removed White Gold, Ceramic, Plating; added Color Coating section.",
+            "Added tactile brushed-metal texture to all material cards.",
+            "Fixed AR scanner UI persisting on other pages after exiting AR experience.",
+            "Standardised hover underline animation across all nav and footer links."
+        ]
+    },
+    {
         version: "v0.7.1",
         changes: [
             "Automatically download and host Tripo3D output to bypass expiring AWS link."
