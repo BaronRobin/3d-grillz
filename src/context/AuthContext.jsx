@@ -356,7 +356,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Admin Action: Download and permanently host AI Mesh URL to ticket
+    // Admin Action: Download and permanently host AI Mesh URL to ticket/order
     const saveAiMeshToTicket = async (email, temporaryUrl) => {
         try {
             // 1. Download the short-lived model directly into browser memory
@@ -378,15 +378,25 @@ export const AuthProvider = ({ children }) => {
                 .from('designs')
                 .getPublicUrl(fileName);
 
-            // 4. Update the DB ticket with the permanent URL
-            const { error: dbError } = await supabase.from('tickets').update({ ai_mesh_url: publicUrl }).eq('email', email);
-            if (dbError) throw dbError;
+            // 4. Update the DB ticket AND order with the permanent URL
+            const { error: tErr } = await supabase.from('tickets').update({ ai_mesh_url: publicUrl }).eq('email', email);
+            const { error: oErr } = await supabase.from('orders').update({ ai_mesh_url: publicUrl }).eq('email', email);
+            
+            if (tErr) console.warn("Could not update ticket AI URL:", tErr);
+            if (oErr) console.warn("Could not update order AI URL:", oErr);
 
-            // 5. Update local React state
+            // 5. Update local React state for both
             setTickets(prev => ({
                 ...prev,
                 [email]: { ...prev[email], ai_mesh_url: publicUrl }
             }));
+            
+            if (orders[email]) {
+                setOrders(prev => ({
+                    ...prev,
+                    [email]: { ...prev[email], ai_mesh_url: publicUrl }
+                }));
+            }
 
             return { success: true };
         } catch (error) {

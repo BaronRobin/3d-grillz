@@ -39,7 +39,10 @@ const AdminDashboard = () => {
         try {
             setGeneratingAiFor(email);
             const modelUrl = await generateGrillzMesh(comments);
-            await saveAiMeshToTicket(email, modelUrl);
+            const res = await saveAiMeshToTicket(email, modelUrl);
+            if (!res.success) {
+                throw new Error("Could not save to Supabase Storage: " + res.error + "\n\n(Tip: Does the 'designs' storage bucket exist? Does it have public INSERT policies?)");
+            }
         } catch (err) {
             alert("AI Generation Error: " + err.message);
         } finally {
