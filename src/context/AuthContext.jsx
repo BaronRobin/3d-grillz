@@ -452,19 +452,73 @@ export const AuthProvider = ({ children }) => {
 
     const approveAndInvite = async (email) => {
         try {
-            // 1. Create Supabase auth account with the temporary password
+            // 1. Snapshot ticket data BEFORE signUp — signUp may fire auth listeners
+            //    that reset state, causing approveTicket to see an empty tickets map.
+            const ticket = tickets[email];
+            if (!ticket) return { success: false, error: 'Ticket not found' };
+
+            // 2. Create Supabase auth account with the temporary password
             const { error: signUpError } = await supabase.auth.signUp({
                 email,
                 password: TEMP_PASSWORD
             });
 
-            // Ignore "already registered" error — user might already have an account
+            // Ignore "already registered" — user might already have an account
             if (signUpError && !signUpError.message.toLowerCase().includes('already registered')) {
                 return { success: false, error: signUpError.message };
             }
 
-            // 2. Approve ticket and create order (needs_password_change: true forces ForceReset on first login)
-            await approveTicket(email);
+            // 3. Build the order using the pre-captured ticket (immune to state flush)
+            const newOrder = {
+                email,
+                name: ticket.name,
+                model_type: ticket.material_id === 'gold' ? 0 : 1,
+                current_stage: 0,
+                history: [{ stage: 'Quote Approved & Email Sent', date: new Date().toLocaleDateString() }],
+                comments: ticket.comments,
+                device_os: ticket.device_os,
+                ai_mesh_url: ticket.ai_mesh_url,
+                needs_password_change: true,
+                original_quote: {
+                    name: ticket.name,
+                    email,
+                    material_id: ticket.material_id,
+                    comments: ticket.comments,
+                    device_os: ticket.device_os,
+                    created_at: ticket.created_at,
+                    status: 'approved'
+                }
+            };
+
+            const [orderResp, ticketResp] = await Promise.all([
+                supabase.from('orders').insert([newOrder]),
+                supabase.from('tickets').update({ status: 'approved' }).eq('email', email)
+            ]);
+
+            if (orderResp.error || ticketResp.error) {
+                return { success: false, error: (orderResp.error || ticketResp.error).message };
+            }
+
+            // 4. Update local state immediately so UI reflects the change
+            setOrders(prev => ({
+                ...prev,
+                [email]: {
+                    name: ticket.name,
+                    stage: 0,
+                    history: newOrder.history,
+                    modelType: newOrder.model_type,
+                    comments: ticket.comments,
+                    needs_password_change: true,
+                    ai_mesh_url: ticket.ai_mesh_url,
+                    custom_designs: [],
+                    original_quote: newOrder.original_quote
+                }
+            }));
+
+            setTickets(prev => ({
+                ...prev,
+                [email]: { ...ticket, status: 'approved' }
+            }));
 
             return { success: true };
         } catch (e) {
@@ -472,6 +526,7 @@ export const AuthProvider = ({ children }) => {
             return { success: false, error: e.message };
         }
     };
+
 
     // Admin Action: Trigger Password Reset Loop
     const triggerPasswordReset = async (email) => {
