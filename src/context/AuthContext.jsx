@@ -216,7 +216,7 @@ export const AuthProvider = ({ children }) => {
             status: 'pending'
         };
 
-        const { error } = await supabase.from('tickets').insert([newTicket]);
+        const { error } = await supabase.from('tickets').upsert([newTicket], { onConflict: 'email' });
 
         if (!error) {
             // Update local state instantly for UI
