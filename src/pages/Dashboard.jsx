@@ -64,23 +64,32 @@ const Dashboard = () => {
 
     const order = getUserOrder(user.email);
 
+    if (!order) {
+        return (
+            <div style={{ paddingTop: '150px', minHeight: '100vh', textAlign: 'center', color: '#888' }}>
+                Loading your dashboard securely...
+            </div>
+        );
+    }
+
     const stages = ['Quote Approved', 'Scan Received', '3D Design', 'Revision Loop', 'Casting', 'Polishing', 'Delivery'];
     const currentStage = order.stage;
 
     return (
         <div style={{
             paddingTop: '110px',
-            minHeight: '100vh',
-            paddingBottom: '5rem',
+            height: '100vh',
+            overflow: 'hidden',
+            paddingBottom: '2rem',
             background: 'radial-gradient(circle at top right, #1a1a1a 0%, #000 100%)',
             width: '100%'
         }}>
-            <div className="container">
+            <div className="container" style={{ height: '100%' }}>
                 {/* Main Grid Layout */}
                 <div className="dashboard-grid">
 
                     {/* TILE 1: ELITE HEADER */}
-                    <div style={{ gridArea: 'header', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '1rem' }}>
+                    <div style={{ gridArea: 'header', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '0.5rem' }}>
                         <div className="fade-in-up">
                             <h2 className="gradient-text" style={{ fontSize: '2.5rem', marginBottom: '0.25rem' }}>
                                 Welcome, {user.displayName || user.email.split('@')[0]}
@@ -102,7 +111,7 @@ const Dashboard = () => {
 
                     {/* TILE 2: TIMELINE HUB */}
                     <BentoTile title="Milestone Progress" icon={FiActivity} gridArea="timeline" delay={0.1}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingLeft: '0.5rem', marginTop: '0.5rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingLeft: '0.5rem', marginTop: '0.5rem', overflowY: 'auto' }}>
                             {stages.map((stage, index) => (
                                 <div key={index} style={{
                                     display: 'flex',
@@ -152,8 +161,8 @@ const Dashboard = () => {
                     </BentoTile>
 
                     {/* TILE 3: MAIN SHOWCASE */}
-                    <div style={{ gridArea: 'showcase', position: 'relative' }} className="fade-in-up">
-                        <div className="glass" style={{ height: '100%', padding: '0', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ gridArea: 'showcase', position: 'relative', height: '100%', borderRadius: '20px', overflow: 'hidden' }} className="fade-in-up">
+                        <div className="glass" style={{ height: '100%', padding: '0', overflow: 'hidden', position: 'relative', borderRadius: '20px' }}>
                             {order.custom_designs && order.custom_designs.length > 0 ? (
                                 <UserWebGLShowcase
                                     designs={order.custom_designs}
@@ -188,29 +197,9 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* TILE 4: TECH SPECS */}
-                    <BentoTile title="Material Blueprint" icon={Layers} gridArea="details" delay={0.2}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <span style={{ color: '#888', fontSize: '0.85rem' }}>Model Class</span>
-                                <span style={{ fontWeight: '600' }}>{['Custom Molded', 'Classic Edition', 'Diamond Limited'][order.modelType]}</span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                <span style={{ color: '#888', fontSize: '0.85rem' }}>Requested Material</span>
-                                <span style={{ fontWeight: '600', textTransform: 'capitalize' }}>
-                                    {order.original_quote?.material_id || (['18k Yellow Gold', 'Sterling Silver', 'Diamond Cut'][order.modelType] || '18k Yellow Gold')}
-                                </span>
-                            </div>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem 0' }}>
-                                <span style={{ color: '#888', fontSize: '0.85rem' }}>Order Date</span>
-                                <span style={{ fontWeight: '600' }}>{order.original_quote?.created_at ? new Date(order.original_quote.created_at).toLocaleDateString() : (order.history?.[0]?.date || 'Today')}</span>
-                            </div>
-                        </div>
-                    </BentoTile>
-
                     {/* TILE 5: MESSAGING */}
                     <BentoTile title="Messages" icon={MessageSquare} gridArea="actions" delay={0.3}>
-                        <div style={{ height: '260px' }}>
+                        <div style={{ flex: 1, minHeight: 0, height: '100%', display: 'flex', flexDirection: 'column' }}>
                             <MessageThread orderEmail={user.email} label="Chat with your designer" />
                         </div>
                     </BentoTile>
