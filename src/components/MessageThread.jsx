@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { supabase } from '../supabaseClient';
 
 /**
  * In-app message thread component, used on both user & admin dashboards.
@@ -17,6 +18,27 @@ const MessageThread = ({ orderEmail, label = 'Messages' }) => {
     useEffect(() => {
         if (orderEmail) {
             fetchMessages(orderEmail);
+
+            // Realtime subscription for new incoming messages
+            const channel = supabase
+                .channel(`messages_${orderEmail}`)
+                .on(
+                    'postgres_changes',
+                    {
+                        event: 'INSERT',
+                        schema: 'public',
+                        table: 'messages',
+                        filter: `order_email=eq.${orderEmail}`
+                    },
+                    () => {
+                        fetchMessages(orderEmail);
+                    }
+                )
+                .subscribe();
+
+            return () => {
+                supabase.removeChannel(channel);
+            };
         }
     }, [orderEmail]);
 

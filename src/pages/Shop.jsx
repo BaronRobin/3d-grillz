@@ -114,14 +114,18 @@ const Shop = () => {
                             type="button"
                             className="btn btn-primary full-width"
                             disabled={comments.trim().length < 5 || name.trim().length === 0 || !email.includes('@') || !email.includes('.') || email.split('.').pop().length < 2}
-                            onClick={(e) => {
+                            onClick={async (e) => {
                                 e.preventDefault();
-                                submitQuoteRequest(email, {
+                                const res = await submitQuoteRequest(email, {
                                     name: name,
                                     materialId: selectedMaterial,
                                     comments: comments
                                 });
-                                setIsSubmitted(true);
+                                if (res?.success) {
+                                    setIsSubmitted(true);
+                                } else {
+                                    alert('Submitting request failed: ' + (res?.error?.message || 'Unknown error. Are you logged in? Check database permissions.'));
+                                }
                             }}
                         >
                             Request Quote

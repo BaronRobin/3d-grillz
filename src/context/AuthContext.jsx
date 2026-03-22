@@ -227,8 +227,10 @@ export const AuthProvider = ({ children }) => {
                     created_at: new Date().toISOString()
                 }
             }));
+            return { success: true };
         } else {
             console.error("Failed to submit request to Supabase", error);
+            return { success: false, error };
         }
     };
 
