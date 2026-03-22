@@ -699,7 +699,7 @@ const AdminDashboard = () => {
                                 {/* RIGHT: Analytics feed */}
                                 <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                     <h3>Target Analytics Feed</h3>
-                                    <div style={{ background: '#111', borderRadius: '8px', border: '1px solid #333', padding: '1.5rem', height: '100%', minHeight: '400px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                    <div style={{ background: '#111', borderRadius: '8px', border: '1px solid #333', padding: '1.5rem', maxHeight: '500px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                                         {userLogs.length === 0 ? (
                                             <p style={{ color: '#666', textAlign: 'center', marginTop: '2rem' }}>No telemetry for this address in the last 30 days.</p>
                                         ) : (

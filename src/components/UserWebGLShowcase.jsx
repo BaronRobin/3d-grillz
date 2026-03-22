@@ -126,7 +126,7 @@ const UserWebGLShowcase = ({ designs = [], requestedMaterialName = "Gold" }) => 
                 </Canvas>
             </div>
 
-            <div className="interaction-hint" style={{ bottom: '80px', top: 'auto', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
+            <div className="interaction-hint" style={{ top: '1.2rem', bottom: 'auto', left: '50%', transform: 'translateX(-50%)', zIndex: 10 }}>
                 <span>Drag to Rotate | Scroll to Zoom</span>
             </div>
 
