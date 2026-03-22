@@ -9,12 +9,13 @@ import UserWebGLShowcase from '../components/UserWebGLShowcase';
 import MessageThread from '../components/MessageThread';
 
 const AdminDashboard = () => {
-    const { user, tickets, orders, allUsers, messages, loading, fetchAdminData, logout, approveTicket, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset, saveAiMeshToTicket, uploadCustomDesign } = useAuth();
+    const { user, tickets, orders, allUsers, messages, loading, fetchAdminData, logout, approveTicket, approveAndInvite, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset, saveAiMeshToTicket, uploadCustomDesign } = useAuth();
     const { fetchActivityLogs, onlineUsers } = useAnalytics();
     const [activeTab, setActiveTab] = useState('tickets');
     const [logs, setLogs] = useState([]);
     const [daysBack, setDaysBack] = useState(7);
     const [isLoadingLogs, setIsLoadingLogs] = useState(false);
+    const [invitingUser, setInvitingUser] = useState(null); // tracks in-progress invites
 
     // Deep Edit State
     const [editingUser, setEditingUser] = useState(null);
@@ -185,14 +186,42 @@ const AdminDashboard = () => {
                                                 </td>
                                                 <td style={{ padding: '1rem' }}>
                                                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-                                                        <button className="btn btn-primary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px' }} onClick={() => approveTicket(email)}>Approve</button>
-                                                        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px' }} onClick={() => updateTicketStatus(email, 'declined')}>Decline</button>
-                                                        <a
-                                                            href={`mailto:${email}?subject=${emailSubject}&body=${emailBody}`}
-                                                            className="btn btn-secondary"
-                                                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textDecoration: 'none', color: 'var(--color-accent)', borderColor: 'var(--color-accent)' }}
+                                                        {/* Approve & Invite — creates account + sends invite email */}
+                                                        <button
+                                                            className="btn btn-primary"
+                                                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', opacity: invitingUser === email ? 0.6 : 1 }}
+                                                            disabled={invitingUser === email}
+                                                            onClick={async () => {
+                                                                setInvitingUser(email);
+                                                                const res = await approveAndInvite(email);
+                                                                setInvitingUser(null);
+                                                                if (res.success) {
+                                                                    // Open pre-filled invite email
+                                                                    const subject = encodeURIComponent('Your Custom Grillz Order Has Been Approved');
+                                                                    const body = encodeURIComponent(
+                                                                        `Hi ${ticket.name},\n\nGreat news — your quote request for ${(ticket.materialId || ticket.material_id || 'custom grillz').replace(/_/g, ' ')} has been reviewed and approved.\n\nYour client dashboard is now live. You can log in using the details below:\n\n  URL: https://baronrobin.github.io/3d-grillz/#/login\n  Email: ${email}\n  Temporary password: WelcomeOnboard!\n\nYou will be prompted to choose your own password on your first login.\n\nFrom your dashboard you can:\n  • Track the progress of your order in real time\n  • View your 3D design previews\n  • Send messages directly to the team\n\nDon't hesitate to reach out if you have any questions.\n\nBest,\nRobin Baron`
+                                                                    );
+                                                                    window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+                                                                } else {
+                                                                    alert('Invite failed: ' + res.error);
+                                                                }
+                                                            }}
                                                         >
-                                                            Draft Reply ✉
+                                                            {invitingUser === email ? 'Processing...' : 'Approve & Invite'}
+                                                        </button>
+
+                                                        {/* Decline */}
+                                                        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px' }} onClick={() => updateTicketStatus(email, 'declined')}>Decline</button>
+
+                                                        {/* Draft Reply — contextual email with full request details */}
+                                                        <a
+                                                            href={`mailto:${email}?subject=${encodeURIComponent('Re: Your Custom Grillz Quote Request')}&body=${encodeURIComponent(
+                                                                `Hi ${ticket.name},\n\nThank you for reaching out about your custom grillz request.\n\nHere's a summary of what you submitted:\n  Material: ${(ticket.materialId || ticket.material_id || 'N/A').replace(/_/g, ' ')}\n  Device: ${ticket.device_os || 'Unknown'}\n  Your notes: "${ticket.comments || 'None provided'}"\n\nI'm currently reviewing your request and will get back to you shortly with next steps.\n\nBest,\nRobin Baron`
+                                                            )}`}
+                                                            className="btn btn-secondary"
+                                                            style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px', textDecoration: 'none', color: '#aaa' }}
+                                                        >
+                                                            Draft Reply
                                                         </a>
                                                     </div>
                                                 </td>

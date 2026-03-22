@@ -447,6 +447,32 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // Admin Action: Approve ticket AND create auth account with temp password
+    const TEMP_PASSWORD = 'WelcomeOnboard!';
+
+    const approveAndInvite = async (email) => {
+        try {
+            // 1. Create Supabase auth account with the temporary password
+            const { error: signUpError } = await supabase.auth.signUp({
+                email,
+                password: TEMP_PASSWORD
+            });
+
+            // Ignore "already registered" error — user might already have an account
+            if (signUpError && !signUpError.message.toLowerCase().includes('already registered')) {
+                return { success: false, error: signUpError.message };
+            }
+
+            // 2. Approve ticket and create order (needs_password_change: true forces ForceReset on first login)
+            await approveTicket(email);
+
+            return { success: true };
+        } catch (e) {
+            console.error('approveAndInvite failed:', e);
+            return { success: false, error: e.message };
+        }
+    };
+
     // Admin Action: Trigger Password Reset Loop
     const triggerPasswordReset = async (email) => {
         const { error: dbError } = await supabase.from('orders').update({ needs_password_change: true }).eq('email', email);
@@ -542,6 +568,7 @@ export const AuthProvider = ({ children }) => {
             updateOrderDetails,
             forceUpdatePassword,
             triggerPasswordReset,
+            approveAndInvite,
             getUserOrder,
             saveAiMeshToTicket,
             uploadCustomDesign,
