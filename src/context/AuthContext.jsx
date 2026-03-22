@@ -12,10 +12,9 @@ import { supabase } from '../supabaseClient';
  */
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
-    const [orders, setOrders] = useState({}); // Stores realtime active orders
-    const [tickets, setTickets] = useState({}); // Stores realtime quote requests
-    const [messages, setMessages] = useState({}); // Stores in-app messages keyed by order_email
-    const [allUsers, setAllUsers] = useState([]); // All registered profiles
+    const [orders, setOrders] = useState({});
+    const [tickets, setTickets] = useState({});
+    const [messages, setMessages] = useState({});
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -67,7 +66,7 @@ export const AuthProvider = ({ children }) => {
 
     const fetchAdminData = async () => {
         try {
-            // Fetch tickets
+            // Fetch tickets (all statuses — pending, approved, declined)
             const { data: ticketData, error: tErr } = await supabase.from('tickets').select('*');
             if (!tErr && ticketData) {
                 const ticketMap = {};
@@ -75,7 +74,7 @@ export const AuthProvider = ({ children }) => {
                 setTickets(ticketMap);
             }
 
-            // Fetch orders
+            // Fetch orders (all stages)
             const { data: orderData, error: oErr } = await supabase.from('orders').select('*');
             if (!oErr && orderData) {
                 const orderMap = {};
@@ -94,13 +93,8 @@ export const AuthProvider = ({ children }) => {
                 });
                 setOrders(orderMap);
             }
-
-            // Fetch all user profiles
-            const { data: profileData } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
-            if (profileData) setAllUsers(profileData);
-
         } catch (e) {
-            console.error("Error fetching admin data:", e);
+            console.error('Error fetching admin data:', e);
         }
     };
 
@@ -609,7 +603,6 @@ export const AuthProvider = ({ children }) => {
             orders,
             tickets,
             messages,
-            allUsers,
             loading,
             login,
             sendMagicLink,

@@ -9,7 +9,7 @@ import UserWebGLShowcase from '../components/UserWebGLShowcase';
 import MessageThread from '../components/MessageThread';
 
 const AdminDashboard = () => {
-    const { user, tickets, orders, allUsers, messages, loading, fetchAdminData, logout, approveTicket, approveAndInvite, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset, saveAiMeshToTicket, uploadCustomDesign } = useAuth();
+    const { user, tickets, orders, messages, loading, fetchAdminData, logout, approveTicket, approveAndInvite, updateTicketStatus, updateOrderStatus, deleteOrder, updateOrderDetails, triggerPasswordReset, saveAiMeshToTicket, uploadCustomDesign } = useAuth();
     const { fetchActivityLogs, onlineUsers } = useAnalytics();
     const [activeTab, setActiveTab] = useState('tickets');
     const [logs, setLogs] = useState([]);
@@ -75,12 +75,17 @@ const AdminDashboard = () => {
     const stages = ['Quote Approved & Email Sent', 'Scan Received', '3D Design', 'Revision Loop', 'Casting', 'Polishing', 'Delivery'];
     const topDays = getTopDays();
 
-    // Group orders by stage for Kanban
-    const kanbanColumns = stages.map((stage, idx) => ({
+    // Group ACTIVE orders (stages 0-5) by stage for Kanban
+    const activeStages = stages.slice(0, 6); // exclude 'Delivery' (index 6) from active board
+    const kanbanColumns = activeStages.map((stage, idx) => ({
         stage,
         idx,
         orders: Object.entries(orders).filter(([, o]) => o.stage === idx)
     }));
+
+    // Archived: declined tickets + delivered orders (stage 6)
+    const declinedTickets = Object.entries(tickets || {}).filter(([, t]) => t.status === 'declined');
+    const deliveredOrders = Object.entries(orders || {}).filter(([, o]) => o.stage === 6);
 
     // Count unread messages across all threads (sent to admin)
     const unreadCount = Object.values(messages).flat().filter(m => m.sender !== 'admin' && !m.read).length;
@@ -123,10 +128,10 @@ const AdminDashboard = () => {
             {/* Tabs */}
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '2rem' }}>
                 {[
-                    { id: 'tickets', label: 'Quote Requests' },
+                    { id: 'tickets', label: 'Requests' },
                     { id: 'orders', label: 'Order Board' },
-                    { id: 'users', label: 'All Users' },
                     { id: 'messages', label: 'Messages', badge: unreadCount },
+                    { id: 'archived', label: 'Archived' },
                     { id: 'analytics', label: 'Live Operations' }
                 ].map(({ id, label, badge }) => (
                     <button key={id} style={tabBtnStyle(id)} onClick={() => setActiveTab(id)}>
@@ -330,64 +335,93 @@ const AdminDashboard = () => {
             )}
 
             {/* ===== ALL USERS ===== */}
-            {activeTab === 'users' && (
-                <div className="glass" style={{ padding: '2rem' }}>
-                    <h3 style={{ marginBottom: '1.5rem' }}>All Registered Users</h3>
-                    {allUsers.length === 0 ? (
-                        <div style={{ color: '#666', textAlign: 'center', padding: '2rem' }}>
-                            <p>No profiles found. Make sure the <code>profiles</code> table and sync trigger are set up in Supabase.</p>
-                        </div>
-                    ) : (
-                        <div style={{ overflowX: 'auto' }}>
-                            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
-                                <thead>
-                                    <tr style={{ borderBottom: '1px solid #333' }}>
-                                        <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Email</th>
-                                        <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Joined</th>
-                                        <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Status</th>
-                                        <th style={{ textAlign: 'left', padding: '1rem', color: '#888' }}>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {allUsers.map(profile => {
-                                        const hasOrder = !!orders[profile.email];
-                                        const hasTicket = !!tickets[profile.email];
-                                        const ticketStatus = tickets[profile.email]?.status;
-                                        return (
-                                            <tr key={profile.id} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                                                <td style={{ padding: '1rem' }}>
-                                                    <div style={{ fontWeight: 'bold' }}>{profile.email}</div>
+            {activeTab === 'archived' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    {/* Delivered orders */}
+                    <div className="glass" style={{ padding: '2rem' }}>
+                        <h3 style={{ marginBottom: '1.5rem', color: 'var(--color-accent)' }}>
+                            ✓ Delivered Orders
+                        </h3>
+                        {deliveredOrders.length === 0 ? (
+                            <p style={{ color: '#555' }}>No delivered orders yet.</p>
+                        ) : (
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+                                    <thead>
+                                        <tr style={{ borderBottom: '1px solid #333' }}>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Client</th>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Material</th>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Original Request</th>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {deliveredOrders.map(([email, order]) => (
+                                            <tr key={email} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                                <td style={{ padding: '0.75rem' }}>
+                                                    <div style={{ fontWeight: 600 }}>{order.name || email.split('@')[0]}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#666' }}>{email}</div>
                                                 </td>
-                                                <td style={{ padding: '1rem', color: '#888', fontSize: '0.85rem' }}>
-                                                    {profile.created_at ? new Date(profile.created_at).toLocaleDateString() : '—'}
+                                                <td style={{ padding: '0.75rem', textTransform: 'capitalize', color: '#aaa' }}>
+                                                    {order.original_quote?.material_id || ['Gold', 'Classic', 'Diamond'][order.modelType] || '—'}
                                                 </td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    {hasOrder ? (
-                                                        <span style={{ padding: '3px 10px', borderRadius: '20px', background: 'rgba(201,169,97,0.1)', color: 'var(--color-accent)', fontSize: '0.8rem' }}>
-                                                            Active Order — {stages[orders[profile.email]?.stage]}
-                                                        </span>
-                                                    ) : hasTicket ? (
-                                                        <span style={{ padding: '3px 10px', borderRadius: '20px', background: ticketStatus === 'pending' ? 'rgba(90,200,250,0.1)' : 'rgba(255,59,48,0.1)', color: ticketStatus === 'pending' ? '#5ac8fa' : '#ff3b30', fontSize: '0.8rem' }}>
-                                                            Quote {ticketStatus}
-                                                        </span>
-                                                    ) : (
-                                                        <span style={{ color: '#444', fontSize: '0.8rem' }}>No activity</span>
-                                                    )}
+                                                <td style={{ padding: '0.75rem', color: '#666', fontSize: '0.85rem', maxWidth: '260px' }}>
+                                                    {order.original_quote?.comments || order.comments || '—'}
                                                 </td>
-                                                <td style={{ padding: '1rem' }}>
-                                                    {hasOrder && (
-                                                        <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px' }} onClick={() => { setActiveTab('orders'); openEdit(profile.email); }}>
-                                                            Manage Order
-                                                        </button>
-                                                    )}
+                                                <td style={{ padding: '0.75rem' }}>
+                                                    <button className="btn btn-secondary" style={{ padding: '0.4rem 0.8rem', fontSize: '0.8rem', borderRadius: '4px' }} onClick={() => openEdit(email)}>
+                                                        View →
+                                                    </button>
                                                 </td>
                                             </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
-                    )}
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Declined tickets */}
+                    <div className="glass" style={{ padding: '2rem' }}>
+                        <h3 style={{ marginBottom: '1.5rem', color: '#ff3b30' }}>
+                            ✕ Declined Requests
+                        </h3>
+                        {declinedTickets.length === 0 ? (
+                            <p style={{ color: '#555' }}>No declined requests.</p>
+                        ) : (
+                            <div style={{ overflowX: 'auto' }}>
+                                <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '500px' }}>
+                                    <thead>
+                                        <tr style={{ borderBottom: '1px solid #333' }}>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Client</th>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Material</th>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Notes</th>
+                                            <th style={{ textAlign: 'left', padding: '0.75rem', color: '#888' }}>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {declinedTickets.map(([email, ticket]) => (
+                                            <tr key={email} style={{ borderBottom: '1px solid rgba(255,255,255,0.04)' }}>
+                                                <td style={{ padding: '0.75rem' }}>
+                                                    <div style={{ fontWeight: 600 }}>{ticket.name}</div>
+                                                    <div style={{ fontSize: '0.75rem', color: '#666' }}>{email}</div>
+                                                </td>
+                                                <td style={{ padding: '0.75rem', textTransform: 'capitalize', color: '#aaa' }}>
+                                                    {ticket.materialId || ticket.material_id || '—'}
+                                                </td>
+                                                <td style={{ padding: '0.75rem', color: '#666', fontSize: '0.85rem', maxWidth: '260px' }}>
+                                                    {ticket.comments || '—'}
+                                                </td>
+                                                <td style={{ padding: '0.75rem', color: '#666', fontSize: '0.8rem', whiteSpace: 'nowrap' }}>
+                                                    {ticket.created_at ? new Date(ticket.created_at).toLocaleDateString() : '—'}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
