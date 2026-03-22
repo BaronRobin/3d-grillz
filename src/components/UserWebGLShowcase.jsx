@@ -120,18 +120,20 @@ const UserWebGLShowcase = ({ designs = [], requestedMaterialName = "Gold" }) => 
                             <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
                             <Environment preset="city" />
 
-                            <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                                <group ref={modelRef}>
-                                    <CustomModel
-                                        url={currentDesign.url}
-                                        materialProps={currentMat}
-                                        showUpper={showUpper}
-                                        showLower={showLower}
-                                    />
-                                </group>
-                            </Float>
+                            <React.Suspense fallback={null}>
+                                <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
+                                    <group ref={modelRef}>
+                                        <CustomModel
+                                            url={currentDesign.url}
+                                            materialProps={currentMat}
+                                            showUpper={showUpper}
+                                            showLower={showLower}
+                                        />
+                                    </group>
+                                </Float>
 
-                            <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
+                                <ContactShadows position={[0, -1.4, 0]} opacity={0.5} scale={10} blur={2.5} far={4} />
+                            </React.Suspense>
                             <OrbitControls enableZoom={true} enablePan={false} autoRotate={false} />
                         </Canvas>
 
