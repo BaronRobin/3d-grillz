@@ -326,6 +326,13 @@ export const AuthProvider = ({ children }) => {
         if (updates.adminNotes !== undefined) payload.admin_notes = updates.adminNotes;
         if (updates.comments !== undefined) payload.comments = updates.comments;
 
+        let newOriginalQuote = null;
+        if (updates.estimatedCost !== undefined) {
+            const existingQuote = orders[email]?.original_quote || {};
+            newOriginalQuote = { ...existingQuote, estimated_cost: updates.estimatedCost };
+            payload.original_quote = newOriginalQuote;
+        }
+
         const { error } = await supabase.from('orders').update(payload).eq('email', email);
 
         if (!error) {
@@ -333,7 +340,11 @@ export const AuthProvider = ({ children }) => {
                 ...prev,
                 [email]: {
                     ...prev[email],
-                    ...updates
+                    name: updates.name !== undefined ? updates.name : prev[email].name,
+                    modelType: updates.modelType !== undefined ? updates.modelType : prev[email].modelType,
+                    stage: updates.stage !== undefined ? updates.stage : prev[email].stage,
+                    admin_notes: updates.adminNotes !== undefined ? updates.adminNotes : prev[email].admin_notes,
+                    original_quote: newOriginalQuote !== null ? newOriginalQuote : prev[email].original_quote
                 }
             }));
             return { success: true };

@@ -109,56 +109,88 @@ const Dashboard = () => {
                         </div>
                     </div>
 
-                    {/* TILE 2: TIMELINE HUB */}
-                    <BentoTile title="Milestone Progress" icon={FiActivity} gridArea="timeline" delay={0.1}>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingLeft: '0.5rem', marginTop: '0.5rem', overflowY: 'auto' }}>
-                            {stages.map((stage, index) => (
-                                <div key={index} style={{
-                                    display: 'flex',
-                                    gap: '1.25rem',
-                                    position: 'relative',
-                                    opacity: index <= currentStage ? 1 : 0.3,
-                                    transition: 'opacity 0.5s ease'
-                                }}>
-                                    {/* Connection Line */}
-                                    {index !== stages.length - 1 && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            left: '11px',
-                                            top: '24px',
-                                            width: '2px',
-                                            height: '24px',
-                                            background: index < currentStage ? 'var(--color-accent)' : '#333'
-                                        }}></div>
-                                    )}
-
-                                    <div style={{
-                                        width: '24px',
-                                        height: '24px',
-                                        borderRadius: '50%',
-                                        background: index < currentStage ? 'var(--color-accent)' : index === currentStage ? '#000' : '#1a1a1a',
-                                        border: `2px solid ${index <= currentStage ? 'var(--color-accent)' : '#444'}`,
+                    {/* TILE 2: LEFT COLUMN (TIMELINE & PAYMENT) */}
+                    <div style={{ gridArea: 'timeline', display: 'flex', flexDirection: 'column', gap: '1.5rem', height: '100%', overflow: 'hidden' }}>
+                        <BentoTile title="Progress" icon={FiActivity} delay={0.1}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', paddingLeft: '0.5rem', marginTop: '0.5rem', overflowY: 'auto' }}>
+                                {stages.map((stage, index) => (
+                                    <div key={index} style={{
                                         display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        flexShrink: 0,
-                                        zIndex: 1
+                                        gap: '1.25rem',
+                                        position: 'relative',
+                                        opacity: index <= currentStage ? 1 : 0.3,
+                                        transition: 'opacity 0.5s ease'
                                     }}>
-                                        {index < currentStage && <FiCheckCircle size={14} color="#000" />}
-                                        {index === currentStage && <div className="pulse" style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '50%' }}></div>}
+                                        {/* Connection Line */}
+                                        {index !== stages.length - 1 && (
+                                            <div style={{
+                                                position: 'absolute',
+                                                left: '11px',
+                                                top: '24px',
+                                                width: '2px',
+                                                height: '24px',
+                                                background: index < currentStage ? 'var(--color-accent)' : '#333'
+                                            }}></div>
+                                        )}
+
+                                        <div style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            background: index < currentStage ? 'var(--color-accent)' : index === currentStage ? '#000' : '#1a1a1a',
+                                            border: `2px solid ${index <= currentStage ? 'var(--color-accent)' : '#444'}`,
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            flexShrink: 0,
+                                            zIndex: 1
+                                        }}>
+                                            {index < currentStage && <FiCheckCircle size={14} color="#000" />}
+                                            {index === currentStage && <div className="pulse" style={{ width: '8px', height: '8px', background: 'var(--color-accent)', borderRadius: '50%' }}></div>}
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column' }}>
+                                            <span style={{
+                                                fontSize: '0.9rem',
+                                                color: index === currentStage ? 'var(--color-accent)' : '#fff',
+                                                fontWeight: index === currentStage ? '700' : '400'
+                                            }}>{stage}</span>
+                                            {index === currentStage && <span style={{ fontSize: '0.7rem', color: '#666' }}>Est. Completion: 3 Days</span>}
+                                        </div>
                                     </div>
-                                    <div style={{ display: 'flex', flexDirection: 'column' }}>
-                                        <span style={{
-                                            fontSize: '0.9rem',
-                                            color: index === currentStage ? 'var(--color-accent)' : '#fff',
-                                            fontWeight: index === currentStage ? '700' : '400'
-                                        }}>{stage}</span>
-                                        {index === currentStage && <span style={{ fontSize: '0.7rem', color: '#666' }}>Est. Completion: 3 Days</span>}
-                                    </div>
+                                ))}
+                            </div>
+                        </BentoTile>
+
+                        {/* PAYMENT VAULT */}
+                        <BentoTile title="Payment" icon={ExternalLink} delay={0.2}>
+                            {order.original_quote?.estimated_cost ? (
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', alignItems: 'center', textAlign: 'center', marginTop: 'auto', marginBottom: 'auto' }}>
+                                    <span style={{ color: '#888', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '1px' }}>Estimated Balance</span>
+                                    <span style={{ fontSize: '2.5rem', fontWeight: 'bold', color: '#fff', letterSpacing: '-1px' }}>${order.original_quote.estimated_cost}</span>
+                                    
+                                    <button 
+                                        className={`btn ${currentStage === 6 ? 'btn-primary' : 'btn-secondary'}`} 
+                                        style={{ 
+                                            width: '100%', 
+                                            marginTop: '0.5rem', 
+                                            opacity: currentStage === 6 ? 1 : 0.5,
+                                            cursor: currentStage === 6 ? 'pointer' : 'not-allowed'
+                                        }}
+                                        onClick={() => {
+                                            if (currentStage === 6) window.open('https://paypal.me/robinlukabaron', '_blank');
+                                        }}
+                                        disabled={currentStage !== 6}
+                                    >
+                                        {currentStage === 6 ? 'Pay Now & Secure Delivery' : 'Locked Until Delivery'}
+                                    </button>
                                 </div>
-                            ))}
-                        </div>
-                    </BentoTile>
+                            ) : (
+                                <div style={{ textAlign: 'center', color: '#666', fontSize: '0.85rem', marginTop: 'auto', marginBottom: 'auto', padding: '1rem' }}>
+                                    Your artisan will provide an estimated cost once the 3D design phase begins.
+                                </div>
+                            )}
+                        </BentoTile>
+                    </div>
 
                     {/* TILE 3: MAIN SHOWCASE */}
                     <div style={{ gridArea: 'showcase', position: 'relative', height: '100%', borderRadius: '20px', overflow: 'hidden' }} className="fade-in-up">

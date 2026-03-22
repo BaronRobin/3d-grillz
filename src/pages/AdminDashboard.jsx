@@ -104,7 +104,8 @@ const AdminDashboard = () => {
             name: orders[email]?.name || '',
             modelType: orders[email]?.modelType || 0,
             stage: orders[email]?.stage || 0,
-            adminNotes: orders[email]?.admin_notes || ''
+            adminNotes: orders[email]?.admin_notes || '',
+            estimatedCost: orders[email]?.original_quote?.estimated_cost || ''
         });
         const hist = await fetchActivityLogs(30);
         setUserLogs(hist.filter(l => l.user_email === email || l.visitor_id === email));
@@ -635,6 +636,11 @@ const AdminDashboard = () => {
                                             </select>
                                         </div>
                                     </div>
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                                        <label>Estimated Cost ($) - Required for Payment Unlock</label>
+                                        <input type="number" value={editForm.estimatedCost} onChange={(e) => setEditForm(prev => ({ ...prev, estimatedCost: e.target.value }))} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#ffcc00' }} placeholder="450.00" />
+                                    </div>
+
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                                         <label>Internal Admin Notes (Hidden from Client)</label>
                                         <textarea value={editForm.adminNotes} onChange={(e) => setEditForm(prev => ({ ...prev, adminNotes: e.target.value }))} rows={3} style={{ padding: '0.75rem', borderRadius: '5px', border: '1px solid #333', background: '#222', color: '#ffcc00', resize: 'vertical' }} placeholder="Private vendor notes..." />
