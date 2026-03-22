@@ -57,8 +57,12 @@ const MessageThread = ({ orderEmail, label = 'Messages' }) => {
         const trimmed = input.trim();
         if (!trimmed || sending) return;
         setSending(true);
-        setInput('');
-        await sendMessage(orderEmail, trimmed);
+        const error = await sendMessage(orderEmail, trimmed);
+        if (error) {
+            alert("Message failed to send: " + error.message + "\n\n(Tip: Check Supabase RLS policies for the 'messages' table!)");
+        } else {
+            setInput('');
+        }
         setSending(false);
     };
 

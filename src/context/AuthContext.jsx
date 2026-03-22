@@ -577,8 +577,10 @@ export const AuthProvider = ({ children }) => {
                 ...prev,
                 [orderEmail]: [...(prev[orderEmail] || []), data]
             }));
+            return null;
         } else {
             console.error('Failed to send message:', error);
+            return error;
         }
     };
 
