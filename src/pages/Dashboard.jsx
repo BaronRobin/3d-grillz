@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Link, Navigate } from 'react-router-dom';
 import WebGLShowcase from '../components/WebGLShowcase';
@@ -13,49 +13,86 @@ import {
     ExternalLink,
     Zap,
     Box,
-    MessageSquare
+    MessageSquare,
+    ChevronUp,
+    ChevronDown
 } from 'lucide-react';
 
 /**
- * Premium Bento-style Dashboard Tile Component
+ * Premium Bento-style Dashboard Tile Component with Auto-Accordion for Mobile
  */
-const BentoTile = ({ children, title, icon: Icon, gridArea, delay = 0 }) => (
-    <div
-        className="glass fade-in-up"
-        style={{
-            gridArea,
-            padding: '1.75rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '1rem',
-            position: 'relative',
-            overflow: 'hidden',
-            animationDelay: `${delay}s`,
-            transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-            cursor: 'default'
-        }}
-        onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'translateY(-5px)';
-            e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
-        }}
-        onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-        }}
-    >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-            {Icon && <Icon size={18} color="var(--color-accent)" style={{ opacity: 0.8 }} />}
-            <span style={{
-                fontSize: '0.8rem',
-                textTransform: 'uppercase',
-                letterSpacing: '1.5px',
-                color: '#888',
-                fontWeight: '600'
-            }}>{title}</span>
+const BentoTile = ({ children, title, icon: Icon, gridArea, delay = 0, defaultOpen = true, forceCollapsible = false }) => {
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 800);
+    const [isOpen, setIsOpen] = useState(defaultOpen);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 800);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Auto-collapse on mobile initialization, auto-expand on desktop
+    useEffect(() => {
+        if (isMobile) {
+            setIsOpen(title === 'Progress' ? true : false); // Keep Progress open as priority, collapse the rest
+        } else {
+            setIsOpen(true);
+        }
+    }, [isMobile, title]);
+
+    const canCollapse = isMobile || forceCollapsible;
+
+    return (
+        <div
+            className="glass fade-in-up"
+            style={{
+                gridArea,
+                padding: '1.75rem',
+                display: 'flex',
+                flexDirection: 'column',
+                position: 'relative',
+                overflow: 'hidden',
+                animationDelay: `${delay}s`,
+                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                cursor: canCollapse ? 'pointer' : 'default',
+                height: (!canCollapse || isOpen) ? '100%' : 'auto'
+            }}
+            onMouseEnter={(e) => {
+                if (!canCollapse) {
+                    e.currentTarget.style.transform = 'translateY(-5px)';
+                    e.currentTarget.style.boxShadow = '0 20px 40px rgba(0,0,0,0.4)';
+                }
+            }}
+            onMouseLeave={(e) => {
+                if (!canCollapse) {
+                    e.currentTarget.style.transform = 'translateY(0)';
+                    e.currentTarget.style.boxShadow = 'none';
+                }
+            }}
+        >
+            <div 
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: (!canCollapse || isOpen) ? '1rem' : '0' }}
+                onClick={() => canCollapse && setIsOpen(!isOpen)}
+            >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    {Icon && <Icon size={18} color="var(--color-accent)" style={{ opacity: 0.8 }} />}
+                    <span style={{ fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '1.5px', color: '#888', fontWeight: '600' }}>{title}</span>
+                </div>
+                {canCollapse && (
+                    <div style={{ color: '#888' }}>
+                        {isOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                    </div>
+                )}
+            </div>
+            
+            {(!canCollapse || isOpen) && (
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                    {children}
+                </div>
+            )}
         </div>
-        {children}
-    </div>
-);
+    );
+};
 
 const Dashboard = () => {
     const { user, getUserOrder } = useAuth();
@@ -76,14 +113,7 @@ const Dashboard = () => {
     const currentStage = order.stage;
 
     return (
-        <div style={{
-            paddingTop: '110px',
-            height: '100vh',
-            overflow: 'hidden',
-            paddingBottom: '2rem',
-            background: 'radial-gradient(circle at top right, #1a1a1a 0%, #000 100%)',
-            width: '100%'
-        }}>
+        <div className="dashboard-wrapper">
             <div className="container" style={{ height: '100%' }}>
                 {/* Main Grid Layout */}
                 <div className="dashboard-grid">

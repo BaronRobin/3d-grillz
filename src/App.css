@@ -296,6 +296,15 @@ a {
   text-align: center;
 }
 
+.dashboard-wrapper {
+    padding-top: 110px;
+    height: 100vh;
+    overflow: hidden;
+    padding-bottom: 2rem;
+    background: radial-gradient(circle at top right, #1a1a1a 0%, #000 100%);
+    width: 100%;
+}
+
 /* Dashboard Bento Grid Layout */
 .dashboard-grid {
     display: grid;
@@ -321,6 +330,13 @@ a {
 }
 
 @media (max-width: 800px) {
+    .dashboard-wrapper {
+        height: auto;
+        min-height: 100vh;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
     .dashboard-grid {
         grid-template-columns: 1fr;
         grid-template-areas:
@@ -329,6 +345,10 @@ a {
             "timeline"
             "actions";
         height: auto;
+    }
+    
+    .showcase-tile {
+        height: 55vh !important;
     }
 }
 
