@@ -41,7 +41,10 @@ const AdminDashboard = () => {
             const modelUrl = await generateGrillzMesh(comments);
             const res = await saveAiMeshToTicket(email, modelUrl);
             if (!res.success) {
-                throw new Error("Could not save to Supabase Storage: " + res.error + "\n\n(Tip: Does the 'designs' storage bucket exist? Does it have public INSERT policies?)");
+                const manual = window.confirm(`Browser security blocked the automatic database upload.\n\nHowever, the 3D model WAS generated successfully by Tripo3D!\n\nWould you like to manually download the .glb file now? You can then use the 'Upload Custom Design' box below to attach it to the client's order.`);
+                if (manual && res.temporaryUrl) {
+                    window.open(res.temporaryUrl, '_blank');
+                }
             }
         } catch (err) {
             alert("AI Generation Error: " + err.message);

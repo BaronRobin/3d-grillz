@@ -402,7 +402,7 @@ export const AuthProvider = ({ children }) => {
             return { success: true };
         } catch (error) {
             console.error("Failed to host AI mesh:", error);
-            return { success: false, error: error.message };
+            return { success: false, error: error.message, temporaryUrl };
         }
     };
 
