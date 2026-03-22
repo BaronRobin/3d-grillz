@@ -360,9 +360,10 @@ export const AuthProvider = ({ children }) => {
     const saveAiMeshToTicket = async (email, temporaryUrl) => {
         try {
             // 1. Download the short-lived model directly into browser memory
-            // Note: Tripo3D S3 URLs have permissive CORS, proxying large binaries often corrupts them
-            const fetchRes = await fetch(temporaryUrl);
-            if (!fetchRes.ok) throw new Error("Failed to download mesh. " + fetchRes.statusText);
+            // Note: Tripo3D strictly blocks direct CORS fetch, so we use a proxy optimized for raw binaries
+            const CORS_PROXY = 'https://api.allorigins.win/raw?url=';
+            const fetchRes = await fetch(CORS_PROXY + encodeURIComponent(temporaryUrl));
+            if (!fetchRes.ok) throw new Error("Proxy failed to download mesh. " + fetchRes.statusText);
             const blob = await fetchRes.blob();
 
             // 2. Upload it permanently to our own Supabase Storage bucket
