@@ -675,7 +675,7 @@ const AdminDashboard = () => {
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.5rem' }}>
                                         <div>
                                             {deleteInput === 'Delete' ? (
-                                                <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', background: '#ff3b30' }} onClick={async () => { await deleteOrder(editingUser); setEditingUser(null); }}>Purge Order</button>
+                                                <button className="btn btn-primary" style={{ padding: '0.6rem 1.2rem', fontSize: '0.85rem', borderRadius: '4px', background: '#ff3b30' }} onClick={async () => { await deleteOrder(editingUser); setEditingUser(null); }}>Purge & Archive</button>
                                             ) : (
                                                 <input type="text" value={deleteInput} onChange={(e) => setDeleteInput(e.target.value)} placeholder="Type 'Delete' to unlock wipe" style={{ padding: '0.5rem', border: '1px solid red', borderRadius: '5px', background: 'transparent', color: 'red', fontSize: '0.85rem' }} />
                                             )}

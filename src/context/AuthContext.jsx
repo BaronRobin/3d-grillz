@@ -293,12 +293,12 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    // Admin Action: Delete Order and Revert Ticket
+    // Admin Action: Delete Order and Archive Ticket
     const deleteOrder = async (email) => {
-        // Drop the order
+        // Drop the active order
         const { error: orderError } = await supabase.from('orders').delete().eq('email', email);
-        // Revert ticket to pending so it can be re-evaluated
-        const { error: ticketError } = await supabase.from('tickets').update({ status: 'pending' }).eq('email', email);
+        // Move the ticket to 'declined' so it shows up in Archived instead of returning to Requests
+        const { error: ticketError } = await supabase.from('tickets').update({ status: 'declined' }).eq('email', email);
 
         if (!orderError && !ticketError) {
             setOrders(prev => {
@@ -308,7 +308,7 @@ export const AuthProvider = ({ children }) => {
             });
             setTickets(prev => ({
                 ...prev,
-                [email]: { ...prev[email], status: 'pending' }
+                [email]: { ...prev[email], status: 'declined' }
             }));
             return { success: true };
         } else {
