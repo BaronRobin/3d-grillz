@@ -57,16 +57,7 @@ const UserWebGLShowcase = ({ designs = [], requestedMaterialName = "Gold" }) => 
 
     const [matIndex, setMatIndex] = useState(defaultMatIndex);
 
-    const modelRef = useRef();
 
-    // Subtle breathing/floating animation
-    useFrame((state) => {
-        const t = state.clock.getElapsedTime();
-        if (modelRef.current) {
-            modelRef.current.rotation.y = Math.sin(t / 4) / 4;
-            modelRef.current.rotation.z = (1 + Math.sin(t / 1.5)) / 40;
-        }
-    });
 
     const currentDesign = designs[index];
     const currentMat = materials[matIndex];
@@ -122,7 +113,7 @@ const UserWebGLShowcase = ({ designs = [], requestedMaterialName = "Gold" }) => 
 
                             <React.Suspense fallback={null}>
                                 <Float speed={2} rotationIntensity={0.5} floatIntensity={1}>
-                                    <group ref={modelRef}>
+                                    <group>
                                         <CustomModel
                                             url={currentDesign.url}
                                             materialProps={currentMat}
