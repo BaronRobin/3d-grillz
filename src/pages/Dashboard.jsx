@@ -223,7 +223,7 @@ const Dashboard = () => {
                     </div>
 
                     {/* TILE 3: MAIN SHOWCASE */}
-                    <div style={{ gridArea: 'showcase', position: 'relative', height: '100%', borderRadius: '20px', overflow: 'hidden' }} className="fade-in-up">
+                    <div style={{ gridArea: 'showcase', position: 'relative', height: '100%', borderRadius: '20px', overflow: 'hidden' }} className="fade-in-up showcase-tile">
                         <div className="glass" style={{ height: '100%', padding: '0', overflow: 'hidden', position: 'relative', borderRadius: '20px' }}>
                             {order.custom_designs && order.custom_designs.length > 0 ? (
                                 <UserWebGLShowcase
@@ -232,6 +232,7 @@ const Dashboard = () => {
                                 />
                             ) : (
                                 <WebGLShowcase
+                                    hideHeader={true}
                                     modelUrl={order.ai_mesh_url || null}
                                     forcedMaterial={order.ai_mesh_url ? { color: '#eec95e', roughness: 0.1 } : null}
                                 />
