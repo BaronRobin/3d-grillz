@@ -168,6 +168,27 @@
     margin-bottom: 2rem;
 }
 
+@keyframes changelog-ease-in {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.changelog-item--reveal {
+    animation: changelog-ease-in 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Stagger each newly revealed item slightly */
+.changelog-item--reveal:nth-child(3n + 1) { animation-delay: 0ms; }
+.changelog-item--reveal:nth-child(3n + 2) { animation-delay: 80ms; }
+.changelog-item--reveal:nth-child(3n + 3) { animation-delay: 160ms; }
+
+
 .changelog-item:last-child {
     margin-bottom: 0;
 }

@@ -2,14 +2,12 @@ import React, { useState } from 'react';
 import './AboutMe.css';
 import { changelogData } from '../data/changelogData';
 
-/**
- * AboutMe Component displaying the creator's information and skills.
- * @returns {JSX.Element}
- */
 const AboutMe = () => {
     const [visibleVersions, setVisibleVersions] = useState(3);
+    const [prevVisible, setPrevVisible] = useState(3);
 
     const loadMoreChangelog = () => {
+        setPrevVisible(visibleVersions);
         setVisibleVersions(prev => prev + 3);
     };
 
@@ -28,12 +26,6 @@ const AboutMe = () => {
                             </div>
                         </div>
 
-                        {/* Text removed per user request */}
-
-                        {/* Quotes removed per user request */}
-
-                        {/* Design Stack removed per user request */}
-
                         <div className="about-cta" style={{ marginBottom: '3rem' }}>
                             <button className="btn btn-primary" onClick={() => window.open('https://baronrobin.github.io/', '_blank', 'noopener,noreferrer')}>
                                 Learn More
@@ -45,7 +37,10 @@ const AboutMe = () => {
                             <h3 className="gradient-text" style={{ marginBottom: '1.5rem', display: 'inline-block' }}>Project Changelog</h3>
                             <div className="changelog-timeline">
                                 {changelogData.slice(0, visibleVersions).map((log, index) => (
-                                    <div key={index} className="changelog-item">
+                                    <div
+                                        key={index}
+                                        className={`changelog-item${index >= prevVisible ? ' changelog-item--reveal' : ''}`}
+                                    >
                                         <div className="changelog-version-badge">{log.version}</div>
                                         <ul className="changelog-details">
                                             {log.changes.map((change, idx) => (
@@ -62,13 +57,6 @@ const AboutMe = () => {
                             )}
                         </div>
                     </div>
-
-                    {/* Right side visual removed/merged as requested to put profile next to name */}
-                    {/* If we want to keep the grid structure but empty right side, or just make it single column? 
-                        The user screenshot showed "The Creator Rob" and the photo next to it (circled).
-                        So likely single column centered or left aligned.
-                        I will remove the second column div.
-                    */}
                 </div>
             </div>
         </section>
